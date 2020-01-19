@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebugInfo|Win32">
+      <Configuration>RelWithDebugInfo</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebugInfo|x64">
+      <Configuration>RelWithDebugInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{FAD16FBE-D59A-4B14-BB31-B70B0D7AF1AC}</ProjectGuid>
+    <RootNamespace>iplanner</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebugInfo|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebugInfo|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebugInfo|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebugInfo|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
+    <TargetName>$(ProjectName)d</TargetName>
+    <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebugInfo|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
+    <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebugInfo|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
+    <TargetName>$(ProjectName)rd</TargetName>
+    <IntDir>$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level1</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\lib\eigen-eigen-323c052e1731;C:\lib\assimp\include;C:\Program Files\MATLAB\R2019a\extern\include;..\lib;..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;libmat.lib;libmx.lib;libMatlabEngine.lib;libMatlabDataArray.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files\MATLAB\R2019a\extern\lib\win64\microsoft;..\lib</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebugInfo|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level1</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\lib\eigen-eigen-323c052e1731;C:\lib\assimp\include;C:\Program Files\MATLAB\R2019a\extern\include;..\lib;..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;libmat.lib;libmx.lib;libMatlabEngine.lib;libMatlabDataArray.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files\MATLAB\R2019a\extern\lib\win64\microsoft;..\lib</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebugInfo|x64'">
+    <ClCompile>
+      <WarningLevel>Level1</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\lib\eigen-eigen-323c052e1731;C:\lib\assimp\include;C:\Program Files\MATLAB\R2019a\extern\include;..\lib;..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;libmat.lib;libmx.lib;libMatlabEngine.lib;libMatlabDataArray.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files\MATLAB\R2019a\extern\lib\win64\microsoft;..\lib</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\lib\glad\glad.c" />
+    <ClCompile Include="..\lib\tinyxml2\tinyxml2.cpp" />
+    <ClCompile Include="..\src\iplanner\dataset\dataset.cc" />
+    <ClCompile Include="..\src\iplanner\dataset\dataset_utkinect.cc" />
+    <ClCompile Include="..\src\iplanner\dataset\dataset_wnp.cc" />
+    <ClCompile Include="..\src\iplanner\data\point_cloud.cc" />
+    <ClCompile Include="..\src\iplanner\engine.cc" />
+    <ClCompile Include="..\src\iplanner\font\font.cc" />
+    <ClCompile Include="..\src\iplanner\human\human_label.cc" />
+    <ClCompile Include="..\src\iplanner\human\human_model.cc" />
+    <ClCompile Include="..\src\iplanner\mesh\mesh_loader.cc" />
+    <ClCompile Include="..\src\iplanner\mesh\mesh.cc" />
+    <ClCompile Include="..\src\iplanner\mesh\mesh_object.cc" />
+    <ClCompile Include="..\src\iplanner\object\framebuffer.cc" />
+    <ClCompile Include="..\src\iplanner\object\renderbuffer.cc" />
+    <ClCompile Include="..\src\iplanner\object\texture.cc" />
+    <ClCompile Include="..\src\iplanner\object\uniform_buffer.cc" />
+    <ClCompile Include="..\src\iplanner\renderer.cc" />
+    <ClCompile Include="..\src\iplanner\main.cc" />
+    <ClCompile Include="..\src\iplanner\object\vertex_array.cc" />
+    <ClCompile Include="..\src\iplanner\robot\robot_joint.cc" />
+    <ClCompile Include="..\src\iplanner\robot\robot_link.cc" />
+    <ClCompile Include="..\src\iplanner\robot\robot_model.cc" />
+    <ClCompile Include="..\src\iplanner\robot\robot_model_loader.cc" />
+    <ClCompile Include="..\src\iplanner\robot\robot_state.cc" />
+    <ClCompile Include="..\src\iplanner\scene\camera.cc" />
+    <ClCompile Include="..\src\iplanner\scene\ground_node.cc" />
+    <ClCompile Include="..\src\iplanner\scene\human_label_node.cc" />
+    <ClCompile Include="..\src\iplanner\scene\mesh_node.cc" />
+    <ClCompile Include="..\src\iplanner\scene\point_cloud_node.cc" />
+    <ClCompile Include="..\src\iplanner\scene\robot_node.cc" />
+    <ClCompile Include="..\src\iplanner\scene\scene.cc" />
+    <ClCompile Include="..\src\iplanner\scene\scene_node.cc" />
+    <ClCompile Include="..\src\iplanner\sensor\kinect_v2.cc" />
+    <ClCompile Include="..\src\iplanner\shader\program.cc" />
+    <ClCompile Include="..\src\iplanner\shader\shader.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\lib\glad\glad.h" />
+    <ClInclude Include="..\lib\stb\stb_image.h" />
+    <ClInclude Include="..\lib\tinyxml2\tinyxml2.h" />
+    <ClInclude Include="..\src\iplanner\dataset\dataset.h" />
+    <ClInclude Include="..\src\iplanner\dataset\dataset_utkinect.h" />
+    <ClInclude Include="..\src\iplanner\dataset\dataset_wnp.h" />
+    <ClInclude Include="..\src\iplanner\data\point_cloud.h" />
+    <ClInclude Include="..\src\iplanner\engine.h" />
+    <ClInclude Include="..\src\iplanner\font\font.h" />
+    <ClInclude Include="..\src\iplanner\human\human_label.h" />
+    <ClInclude Include="..\src\iplanner\human\human_model.h" />
+    <ClInclude Include="..\src\iplanner\mesh\mesh_loader.h" />
+    <ClInclude Include="..\src\iplanner\mesh\mesh.h" />
+    <ClInclude Include="..\src\iplanner\mesh\mesh_object.h" />
+    <ClInclude Include="..\src\iplanner\object\buffer.h" />
+    <ClInclude Include="..\src\iplanner\object\framebuffer.h" />
+    <ClInclude Include="..\src\iplanner\object\renderbuffer.h" />
+    <ClInclude Include="..\src\iplanner\object\texture.h" />
+    <ClInclude Include="..\src\iplanner\object\uniform_buffer.h" />
+    <ClInclude Include="..\src\iplanner\renderer.h" />
+    <ClInclude Include="..\src\iplanner\object\vertex_array.h" />
+    <ClInclude Include="..\src\iplanner\robot\robot_joint.h" />
+    <ClInclude Include="..\src\iplanner\robot\robot_link.h" />
+    <ClInclude Include="..\src\iplanner\robot\robot_model.h" />
+    <ClInclude Include="..\src\iplanner\robot\robot_model_loader.h" />
+    <ClInclude Include="..\src\iplanner\robot\robot_state.h" />
+    <ClInclude Include="..\src\iplanner\scene\camera.h" />
+    <ClInclude Include="..\src\iplanner\scene\ground_node.h" />
+    <ClInclude Include="..\src\iplanner\scene\human_label_node.h" />
+    <ClInclude Include="..\src\iplanner\scene\light.h" />
+    <ClInclude Include="..\src\iplanner\scene\mesh_node.h" />
+    <ClInclude Include="..\src\iplanner\scene\point_cloud_node.h" />
+    <ClInclude Include="..\src\iplanner\scene\robot_node.h" />
+    <ClInclude Include="..\src\iplanner\scene\scene.h" />
+    <ClInclude Include="..\src\iplanner\scene\scene_node.h" />
+    <ClInclude Include="..\src\iplanner\sensor\kinect_v2.h" />
+    <ClInclude Include="..\src\iplanner\shader\program.h" />
+    <ClInclude Include="..\src\iplanner\shader\shader.h" />
+    <ClInclude Include="..\src\iplanner\types.h" />
+    <ClInclude Include="..\src\iplanner\utils\json.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\dataset\watch-n-patch\kitchen1\data_01-05-11\body.struct" />
+    <None Include="..\..\fetch_ros\fetch_description\robots\fetch.urdf" />
+    <None Include="..\src\shader\color_camera.frag" />
+    <None Include="..\src\shader\color_camera.vert" />
+    <None Include="..\src\shader\color_depth.frag" />
+    <None Include="..\src\shader\color_depth.vert" />
+    <None Include="..\src\shader\color_point_cloud.frag" />
+    <None Include="..\src\shader\color_point_cloud.geom" />
+    <None Include="..\src\shader\color_point_cloud.vert" />
+    <None Include="..\src\shader\color_screen.frag" />
+    <None Include="..\src\shader\color_screen.vert" />
+    <None Include="..\src\shader\depth_camera.frag" />
+    <None Include="..\src\shader\depth_camera.vert" />
+    <None Include="..\src\shader\depth_point_cloud.frag" />
+    <None Include="..\src\shader\depth_point_cloud.geom" />
+    <None Include="..\src\shader\depth_point_cloud.vert" />
+    <None Include="..\src\shader\depth_screen.frag" />
+    <None Include="..\src\shader\depth_screen.vert" />
+    <None Include="..\src\shader\human_edge.frag" />
+    <None Include="..\src\shader\human_edge.vert" />
+    <None Include="..\src\shader\texture.frag" />
+    <None Include="..\src\shader\texture.vert" />
+    <None Include="..\src\shader\texture_3d.frag" />
+    <None Include="..\src\shader\texture_3d.vert" />
+    <None Include="..\src\shader\tutorial.frag" />
+    <None Include="..\src\shader\tutorial.vert" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,381 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="lib">
+      <UniqueIdentifier>{04c45289-7d3d-47b7-a6c1-f751acf1668d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\glad">
+      <UniqueIdentifier>{46416e50-37de-46c4-bc9e-5d366375c868}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\iplanner">
+      <UniqueIdentifier>{0ae6c97c-d7e3-4a1c-9111-3221ee222ff2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\iplanner\object">
+      <UniqueIdentifier>{d671dc74-4f82-441d-b860-71245b794f6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\iplanner\shader">
+      <UniqueIdentifier>{b78ed765-5151-4c3e-9c3d-1cbc14c04495}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\iplanner\utils">
+      <UniqueIdentifier>{5bf2f0bb-352c-49cf-bc08-c03eb759dc9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\iplanner\font">
+      <UniqueIdentifier>{f5cdf005-b5ac-47e4-beef-512983713865}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\stb">
+      <UniqueIdentifier>{2d0373d8-7058-44ed-8ba2-d3acbf721ec6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\iplanner\robot">
+      <UniqueIdentifier>{bedf21f1-24bd-465d-84e6-49cf63715360}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{abc0a15f-ac57-44ed-8882-6e08610aacb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\robot">
+      <UniqueIdentifier>{14716eec-a2d0-44b4-b2a8-93c19d6f97a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\tinyxml2">
+      <UniqueIdentifier>{56fb3503-2173-4044-a78e-e9bc67d69a7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\iplanner\scene">
+      <UniqueIdentifier>{446d8997-e5a4-4cb5-88e4-4e01da749632}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\iplanner\mesh">
+      <UniqueIdentifier>{d7459cb3-b868-4545-8460-9ae8afd6b352}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\iplanner\sensor">
+      <UniqueIdentifier>{89e979a7-97ec-4132-aa0e-36d722c186e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\iplanner\dataset">
+      <UniqueIdentifier>{88f291f8-0010-43a2-8614-9262a7622501}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\iplanner\data">
+      <UniqueIdentifier>{86f10de6-21f0-48e7-abf6-4c8610013c63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\iplanner\human">
+      <UniqueIdentifier>{7b742125-c211-4c38-92f8-4edc032e8f9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\dataset_sample">
+      <UniqueIdentifier>{450e718f-6973-45d4-bf9c-bd8b25cf58be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shader">
+      <UniqueIdentifier>{e6708af9-2009-494b-ad9a-2e3c411c10b2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\lib\glad\glad.c">
+      <Filter>lib\glad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\shader\program.cc">
+      <Filter>src\iplanner\shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\shader\shader.cc">
+      <Filter>src\iplanner\shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\main.cc">
+      <Filter>src\iplanner</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\engine.cc">
+      <Filter>src\iplanner</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\object\vertex_array.cc">
+      <Filter>src\iplanner\object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\renderer.cc">
+      <Filter>src\iplanner</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\object\texture.cc">
+      <Filter>src\iplanner\object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\robot\robot_model.cc">
+      <Filter>src\iplanner\robot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\robot\robot_model_loader.cc">
+      <Filter>src\iplanner\robot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\tinyxml2\tinyxml2.cpp">
+      <Filter>lib\tinyxml2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\robot\robot_joint.cc">
+      <Filter>src\iplanner\robot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\robot\robot_link.cc">
+      <Filter>src\iplanner\robot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\scene\scene.cc">
+      <Filter>src\iplanner\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\scene\scene_node.cc">
+      <Filter>src\iplanner\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\scene\camera.cc">
+      <Filter>src\iplanner\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\mesh\mesh.cc">
+      <Filter>src\iplanner\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\mesh\mesh_loader.cc">
+      <Filter>src\iplanner\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\object\framebuffer.cc">
+      <Filter>src\iplanner\object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\object\renderbuffer.cc">
+      <Filter>src\iplanner\object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\object\uniform_buffer.cc">
+      <Filter>src\iplanner\object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\mesh\mesh_object.cc">
+      <Filter>src\iplanner\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\scene\robot_node.cc">
+      <Filter>src\iplanner\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\scene\mesh_node.cc">
+      <Filter>src\iplanner\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\scene\ground_node.cc">
+      <Filter>src\iplanner\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\robot\robot_state.cc">
+      <Filter>src\iplanner\robot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\sensor\kinect_v2.cc">
+      <Filter>src\iplanner\sensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\dataset\dataset.cc">
+      <Filter>src\iplanner\dataset</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\dataset\dataset_utkinect.cc">
+      <Filter>src\iplanner\dataset</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\dataset\dataset_wnp.cc">
+      <Filter>src\iplanner\dataset</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\data\point_cloud.cc">
+      <Filter>src\iplanner\data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\scene\point_cloud_node.cc">
+      <Filter>src\iplanner\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\human\human_model.cc">
+      <Filter>src\iplanner\human</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\human\human_label.cc">
+      <Filter>src\iplanner\human</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\scene\human_label_node.cc">
+      <Filter>src\iplanner\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\font\font.cc">
+      <Filter>src\iplanner\font</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\iplanner\utils\json.h">
+      <Filter>src\iplanner\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\glad\glad.h">
+      <Filter>lib\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\shader\program.h">
+      <Filter>src\iplanner\shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\shader\shader.h">
+      <Filter>src\iplanner\shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\engine.h">
+      <Filter>src\iplanner</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\types.h">
+      <Filter>src\iplanner</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\object\vertex_array.h">
+      <Filter>src\iplanner\object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\renderer.h">
+      <Filter>src\iplanner</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\object\texture.h">
+      <Filter>src\iplanner\object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\stb\stb_image.h">
+      <Filter>lib\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\robot\robot_model.h">
+      <Filter>src\iplanner\robot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\robot\robot_model_loader.h">
+      <Filter>src\iplanner\robot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\tinyxml2\tinyxml2.h">
+      <Filter>lib\tinyxml2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\robot\robot_joint.h">
+      <Filter>src\iplanner\robot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\robot\robot_link.h">
+      <Filter>src\iplanner\robot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\scene\scene.h">
+      <Filter>src\iplanner\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\scene\scene_node.h">
+      <Filter>src\iplanner\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\scene\camera.h">
+      <Filter>src\iplanner\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\scene\light.h">
+      <Filter>src\iplanner\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\mesh\mesh.h">
+      <Filter>src\iplanner\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\mesh\mesh_loader.h">
+      <Filter>src\iplanner\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\object\framebuffer.h">
+      <Filter>src\iplanner\object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\object\renderbuffer.h">
+      <Filter>src\iplanner\object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\object\uniform_buffer.h">
+      <Filter>src\iplanner\object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\mesh\mesh_object.h">
+      <Filter>src\iplanner\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\scene\robot_node.h">
+      <Filter>src\iplanner\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\scene\mesh_node.h">
+      <Filter>src\iplanner\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\object\buffer.h">
+      <Filter>src\iplanner\object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\scene\ground_node.h">
+      <Filter>src\iplanner\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\robot\robot_state.h">
+      <Filter>src\iplanner\robot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\sensor\kinect_v2.h">
+      <Filter>src\iplanner\sensor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\dataset\dataset.h">
+      <Filter>src\iplanner\dataset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\dataset\dataset_utkinect.h">
+      <Filter>src\iplanner\dataset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\dataset\dataset_wnp.h">
+      <Filter>src\iplanner\dataset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\data\point_cloud.h">
+      <Filter>src\iplanner\data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\scene\point_cloud_node.h">
+      <Filter>src\iplanner\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\human\human_model.h">
+      <Filter>src\iplanner\human</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\human\human_label.h">
+      <Filter>src\iplanner\human</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\scene\human_label_node.h">
+      <Filter>src\iplanner\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\font\font.h">
+      <Filter>src\iplanner\font</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\shader\tutorial.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\tutorial.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\..\fetch_ros\fetch_description\robots\fetch.urdf">
+      <Filter>resource\robot</Filter>
+    </None>
+    <None Include="..\src\shader\texture.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\texture.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\color_depth.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\color_depth.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\texture_3d.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\texture_3d.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\color_camera.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\color_camera.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\depth_camera.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\depth_camera.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\color_screen.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\color_screen.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\depth_screen.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\depth_screen.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\depth_point_cloud.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\depth_point_cloud.geom">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\depth_point_cloud.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\color_point_cloud.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\color_point_cloud.geom">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\color_point_cloud.vert">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\..\dataset\watch-n-patch\kitchen1\data_01-05-11\body.struct">
+      <Filter>resource\dataset_sample</Filter>
+    </None>
+    <None Include="..\src\shader\human_edge.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\human_edge.vert">
+      <Filter>shader</Filter>
+    </None>
+  </ItemGroup>
+</Project>
