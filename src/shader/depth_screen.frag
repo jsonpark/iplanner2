@@ -4,8 +4,6 @@ in vec2 vertex_tex_coord;
 
 uniform usampler2D depth;
 
-uniform vec2 nearfar;
-
 out vec4 out_color;
 
 void main()

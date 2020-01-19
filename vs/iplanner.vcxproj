@@ -229,6 +229,7 @@
   <ItemGroup>
     <ClCompile Include="..\lib\glad\glad.c" />
     <ClCompile Include="..\lib\tinyxml2\tinyxml2.cpp" />
+    <ClCompile Include="..\src\iplanner\config\config.cc" />
     <ClCompile Include="..\src\iplanner\dataset\dataset.cc" />
     <ClCompile Include="..\src\iplanner\dataset\dataset_utkinect.cc" />
     <ClCompile Include="..\src\iplanner\dataset\dataset_wnp.cc" />
@@ -267,7 +268,9 @@
   <ItemGroup>
     <ClInclude Include="..\lib\glad\glad.h" />
     <ClInclude Include="..\lib\stb\stb_image.h" />
+    <ClInclude Include="..\lib\stb\stb_image_write.h" />
     <ClInclude Include="..\lib\tinyxml2\tinyxml2.h" />
+    <ClInclude Include="..\src\iplanner\config\config.h" />
     <ClInclude Include="..\src\iplanner\dataset\dataset.h" />
     <ClInclude Include="..\src\iplanner\dataset\dataset_utkinect.h" />
     <ClInclude Include="..\src\iplanner\dataset\dataset_wnp.h" />
@@ -310,6 +313,7 @@
     <None Include="..\..\dataset\watch-n-patch\kitchen1\data_01-05-11\body.struct" />
     <None Include="..\..\fetch_ros\fetch_description\robots\fetch.urdf" />
     <None Include="..\.gitignore" />
+    <None Include="..\config\config.json" />
     <None Include="..\README.md" />
     <None Include="..\src\shader\color_camera.frag" />
     <None Include="..\src\shader\color_camera.vert" />

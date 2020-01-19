@@ -68,6 +68,12 @@
     <Filter Include="git">
       <UniqueIdentifier>{8c738ecd-413d-4d60-98c7-b75ada21e1af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\iplanner\config">
+      <UniqueIdentifier>{205c1840-a91c-424d-b1cb-afbd8fbb209e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\config">
+      <UniqueIdentifier>{0ab8c24a-6bc4-41e0-b4a1-a31e8e8c435f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\lib\glad\glad.c">
@@ -177,6 +183,9 @@
     </ClCompile>
     <ClCompile Include="..\src\iplanner\font\font.cc">
       <Filter>src\iplanner\font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\config\config.cc">
+      <Filter>src\iplanner\config</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -300,6 +309,12 @@
     <ClInclude Include="..\src\iplanner\font\font.h">
       <Filter>src\iplanner\font</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\iplanner\config\config.h">
+      <Filter>src\iplanner\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib\stb\stb_image_write.h">
+      <Filter>lib\stb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\shader\tutorial.vert">
@@ -385,6 +400,9 @@
     </None>
     <None Include="..\README.md">
       <Filter>git</Filter>
+    </None>
+    <None Include="..\config\config.json">
+      <Filter>resource\config</Filter>
     </None>
   </ItemGroup>
 </Project>

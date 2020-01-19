@@ -43,6 +43,8 @@ public:
 
   void Bind();
   void Unbind();
+  
+  std::vector<unsigned char> GetImage();
 
   void Update(const void* pixels);
 

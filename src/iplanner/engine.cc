@@ -90,6 +90,7 @@ void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 
 Engine::Engine()
 {
+  config_.Load("..\\config\\config.json");
 }
 
 Engine::~Engine()
@@ -201,6 +202,10 @@ void Engine::Keyboard(Key key, KeyAction action, int mods)
       animation_time_ = 0.;
       animation_start_time_ = glfwGetTime();
       break;
+
+    case Key::S:
+      SaveImageSamples();
+      break;
     }
   }
 }
@@ -211,6 +216,39 @@ void Engine::Resize(int width, int height)
   height_ = height;
 
   redraw_ = true;
+}
+
+void Engine::SaveImageSamples()
+{
+  if (image_samples_saved_)
+  {
+    std::cout << "Image samples already saved" << std::endl;
+    return;
+  }
+
+  std::cout << "save directory: " << config_.GetImageSampleSaveDirectory() << std::endl;
+  for (const auto& image_sample : config_.GetImageSamples())
+  {
+    std::cout << image_sample.dataset << ' '
+      << image_sample.sequence << ' ' << image_sample.index << std::endl;
+
+    if (image_sample.dataset == "wnp")
+    {
+      dataset_wnp_->SelectSequenceFrame(image_sample.sequence, image_sample.index);
+
+      Update();
+
+      renderer_->Render();
+
+      std::string filename = image_sample.dataset + '-' + image_sample.sequence + '-' + image_sample.index;
+      std::replace(filename.begin(), filename.end(), '\\', '-');
+      std::cout << "Saving to " << filename << "*.*" << std::endl;
+      renderer_->SaveImages(config_.GetImageSampleSaveDirectory(), filename);
+      std::cout << "Finished saving images" << std::endl;
+    }
+  }
+
+  image_samples_saved_ = true;
 }
 
 void Engine::Run()
@@ -459,7 +497,7 @@ void Engine::Initialize()
   robot_state_->JointPosition(11) = 0.025;
 
   // Dataset
-  dataset_wnp_ = std::make_shared<Wnp>("..\\..\\dataset\\watch-n-patch");
+  dataset_wnp_ = std::make_shared<Wnp>(config_.GetDatasetDirectory("wnp"));
   point_cloud_ = std::make_shared<PointCloud>();
 
   renderer_->CreateEmptyTexture("data_color", 1920, 1080, Texture::Usage::TEXTURE);

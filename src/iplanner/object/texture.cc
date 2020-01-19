@@ -187,6 +187,32 @@ void Texture::Unbind()
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+std::vector<unsigned char> Texture::GetImage()
+{
+  std::vector<unsigned char> image;
+
+  switch (usage_)
+  {
+  case Usage::TEXTURE:
+  case Usage::COLOR_FRAMEBUFFER:
+    Bind();
+
+    image.resize(width_ * height_ * 3);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, image.data());
+
+    Unbind();
+
+    break;
+
+    // TODO: get image buffer for other types of textures
+
+  default:
+    break;
+  }
+
+  return image;
+}
+
 void Texture::Update(const void* pixels)
 {
   GLenum gl_format = 0;

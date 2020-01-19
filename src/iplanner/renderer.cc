@@ -4,6 +4,9 @@
 
 #include <glad/glad.h>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb/stb_image_write.h>
+
 #include "iplanner/engine.h"
 #include "iplanner/mesh/mesh_loader.h"
 #include "iplanner/scene/mesh_node.h"
@@ -119,6 +122,7 @@ void Renderer::Render()
   UpdateLightUniformFromScene();
 
   glLineWidth(2.f);
+  glEnable(GL_DEPTH_TEST);
 
   // Draw pointcloud -> human (depth test disabled) -> robot
   meshes_to_draw_.clear();
@@ -261,8 +265,57 @@ void Renderer::Render()
     framebuffer_vao_.Draw();
     break;
   }
+}
 
-  glEnable(GL_DEPTH_TEST);
+void Renderer::SaveImages(const std::string& directory, const std::string& filename_prefix)
+{
+  // Prerequisites: Render() is called before saving images
+
+  constexpr int quality = 50;
+
+  std::vector<unsigned char> buffer;
+
+  // TODO: OS-specific directory character
+
+  stbi_flip_vertically_on_write(true);
+
+  glDisable(GL_DEPTH_TEST);
+
+  // Color image from robot
+  framebuffer_color_.Use();
+  std::string filename_color_robot = directory + '\\' + filename_prefix + "-color_robot.jpg";
+  buffer.resize(1920 * 1080 * 3);
+  glReadPixels(0, 0, 1920, 1020, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
+  stbi_write_jpg(filename_color_robot.c_str(), 1920, 1080, 3, buffer.data(), quality);
+
+  // Depth image from robot
+  Framebuffer::UseScreen();
+  glViewport(0, 0, 512, 424);
+  program_depth_screen_->Use();
+  framebuffer_vao_.SetTexture(0, framebuffer_depth_texture_);
+  framebuffer_vao_.Draw();
+
+  std::string filename_depth_robot = directory + '\\' + filename_prefix + "-depth_robot.jpg";
+  buffer.resize(512 * 424 * 3);
+  glReadPixels(0, 0, 512, 424, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
+  stbi_write_jpg(filename_depth_robot.c_str(), 512, 424, 3, buffer.data(), quality);
+
+  // Color image from data
+  std::string filename_color_data = directory + '\\' + filename_prefix + "-color_data.jpg";
+  buffer = textures_.find("data_color")->second->GetImage();
+  stbi_write_jpg(filename_color_data.c_str(), 1920, 1080, 3, buffer.data(), quality);
+
+  // Depth image from data
+  Framebuffer::UseScreen();
+  glViewport(0, 0, 512, 424);
+  program_depth_screen_->Use();
+  data_depth_vao_.SetTexture(0, textures_.find("data_depth")->second);
+  data_depth_vao_.Draw();
+
+  std::string filename_depth_data = directory + '\\' + filename_prefix + "-depth_data.jpg";
+  buffer.resize(512 * 424 * 3);
+  glReadPixels(0, 0, 512, 424, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
+  stbi_write_jpg(filename_depth_data.c_str(), 512, 424, 3, buffer.data(), quality);
 }
 
 void Renderer::UpdateCameraUniformFromScene()

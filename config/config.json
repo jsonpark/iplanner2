@@ -1,0 +1,30 @@
+{
+  "dataset_directory": {
+    "wnp": "..\\..\\dataset\\watch-n-patch",
+    "utkinect":  "..\\..\\dataset\\utkinect"
+  },
+
+  "image_sample_save_directory": "..\\figs",
+  "image_samples": [
+    {
+      "dataset": "wnp",
+      "sequence": "kitchen1\\data_01-21-56",
+      "index": "0029"
+    },
+    {
+      "dataset": "wnp",
+      "sequence": "kitchen1\\data_03-31-37",
+      "index": "0027"
+    },
+    {
+      "dataset": "wnp",
+      "sequence": "kitchen2\\data_04-48-46",
+      "index": "0074"
+    },
+    {
+      "dataset": "wnp",
+      "sequence": "office\\data_11-13-19",
+      "index": "0086"
+    }
+  ]
+}

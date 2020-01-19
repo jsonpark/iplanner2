@@ -379,6 +379,37 @@ void Wnp::SelectSequence(const std::string& name)
   std::cout << "Wnp: could not find sequence name \"" << name << "\"." << std::endl;
 }
 
+void Wnp::SelectSequenceFrame(const std::string& name, const std::string& index)
+{
+  bool sequence_found = false;
+  for (int i = 0; i < sequence_names_.size(); i++)
+  {
+    if (sequence_names_[i] == name)
+    {
+      SelectSequence(i);
+      sequence_found = true;
+      break;
+    }
+  }
+
+  if (!sequence_found)
+  {
+    std::cout << "Wnp: could not find sequence name \"" << name << "\"." << std::endl;
+    return;
+  }
+
+  for (int i = 0; i < num_frames_; i++)
+  {
+    if (ZeroPrependedString(4, rgb_image_indices_[i]) == index)
+    {
+      SelectFrame(i);
+      return;
+    }
+  }
+
+  std::cout << "Wnp: could not find frame index \"" << index << "\"." << std::endl;
+}
+
 int Wnp::FrameRate()
 {
   return 6;

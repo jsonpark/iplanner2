@@ -33,6 +33,8 @@ public:
   void Initialize();
   void Render();
 
+  void SaveImages(const std::string& directory, const std::string& filename_prefix);
+
   void SetScene(std::shared_ptr<Scene> scene);
 
   void CreateEmptyTexture(const std::string& name, int width, int height, Texture::Usage usage = Texture::Usage::TEXTURE);

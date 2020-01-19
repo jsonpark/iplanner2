@@ -4,6 +4,7 @@
 #include <array>
 
 #include "iplanner/renderer.h"
+#include "iplanner/config/config.h"
 #include "iplanner/robot/robot_model.h"
 #include "iplanner/robot/robot_state.h"
 #include "iplanner/scene/scene.h"
@@ -192,6 +193,8 @@ public:
 
   Vector2i GetScreenSize() const;
 
+  void SaveImageSamples();
+
   auto GetViewMode() const
   {
     return view_mode_;
@@ -221,8 +224,10 @@ private:
 
   bool redraw_ = true;
   bool animation_ = false;
-  double animation_start_time_;
+  double animation_start_time_ = 0.;
   double animation_time_ = 0.;
+
+  bool image_samples_saved_ = false;
 
   std::unique_ptr<Renderer> renderer_;
   std::shared_ptr<Camera> view_camera_;
@@ -231,6 +236,9 @@ private:
   std::shared_ptr<Scene> scene_;
 
   ViewMode view_mode_ = ViewMode::ALL;
+
+  // Config
+  Config config_;
 
   // Robot
   std::shared_ptr<RobotModel> robot_model_;
