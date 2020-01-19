@@ -120,7 +120,20 @@ void Renderer::Render()
 
   glLineWidth(2.f);
 
+  // Draw pointcloud -> human (depth test disabled) -> robot
+  meshes_to_draw_.clear();
+  point_cloud_node_ = nullptr;
+  point_cloud_ = nullptr;
   human_label_node_ = nullptr;
+  human_label_ = nullptr;
+
+  TraverseSceneNode(scene_->GetRootNode());
+  UpdatePointCloudBuffers();
+  UpdateHumanLabelBuffers();
+
+  auto view_camera = scene_->GetCamera("view");
+  auto color_camera = scene_->GetCamera("color");
+  auto depth_camera = scene_->GetCamera("depth");
 
   // Rendering color camera image to texture
   framebuffer_color_.Use();
@@ -130,15 +143,14 @@ void Renderer::Render()
 
   program_color_camera_->Use();
   program_color_camera_->BindUniformBuffer(0, color_camera_uniform_);
+  program_color_camera_->Uniform3f("eye_position", color_camera->GetEye());
   program_color_point_cloud_->Uniform1f("point_size", 1.f);
   program_color_point_cloud_->BindUniformBuffer(0, color_camera_uniform_);
   program_human_edge_->BindUniformBuffer(0, color_camera_uniform_);
-  current_program_ = program_color_camera_;
-  TraverseSceneNode(scene_->GetRootNode());
 
-  glDisable(GL_DEPTH_TEST);
-  DrawHumanLabelNodes();
-  glEnable(GL_DEPTH_TEST);
+  DrawPointCloudColor();
+  DrawHumanLabelColor();
+  DrawMeshesColor();
 
   // Rendering depth camera image to texture
   framebuffer_depth_.Use();
@@ -151,15 +163,12 @@ void Renderer::Render()
   glViewport(0, 0, 512, 424);
 
   program_depth_camera_->Use();
-  current_program_ = program_depth_camera_;
   program_depth_point_cloud_->BindUniformBuffer(0, depth_camera_uniform_);
-  TraverseSceneNode(scene_->GetRootNode());
-
-  glDisable(GL_DEPTH_TEST);
-  program_color_point_cloud_->BindUniformBuffer(0, depth_camera_uniform_);
   program_human_edge_->BindUniformBuffer(0, depth_camera_uniform_);
-  DrawHumanLabelNodes();
-  glEnable(GL_DEPTH_TEST);
+
+  DrawPointCloudDepth();
+  DrawHumanLabelDepth();
+  DrawMeshesDepth();
 
   // Rendering to the screen
 
@@ -179,14 +188,14 @@ void Renderer::Render()
     glViewport(0, 0, 1280, 720);
     program_color_camera_->Use();
     program_color_camera_->BindUniformBuffer(0, view_camera_uniform_);
+    program_color_camera_->Uniform3f("eye_position", view_camera->GetEye());
     program_color_point_cloud_->BindUniformBuffer(0, view_camera_uniform_);
     program_color_point_cloud_->Uniform1f("point_size", 1.f);
     program_human_edge_->BindUniformBuffer(0, view_camera_uniform_);
-    current_program_ = program_color_camera_;
-    TraverseSceneNode(scene_->GetRootNode());
 
-    glDisable(GL_DEPTH_TEST);
-    DrawHumanLabelNodes();
+    DrawPointCloudColor();
+    DrawHumanLabelColor();
+    DrawMeshesColor();
   }
 
   glDisable(GL_DEPTH_TEST);
@@ -339,52 +348,19 @@ void Renderer::TraverseSceneNode(std::shared_ptr<SceneNode> node, Affine3d trans
     if (mesh_objects_.find(mesh_filename) == mesh_objects_.cend())
       mesh_objects_.emplace(mesh_filename, MeshObject(mesh_filename));
 
-    current_program_->UniformMatrix4f("model", transform.cast<float>().matrix());
-    mesh_objects_[mesh_filename].Draw();
+    meshes_to_draw_.emplace_back(mesh_filename, transform);
   }
 
   else if (node->IsGroundNode())
   {
-    current_program_->UniformMatrix4f("model", transform.cast<float>().matrix());
-    //ground_vao_.Draw();
+    // TODO
   }
 
   else if (node->IsPointCloudNode())
   {
-    auto point_cloud_node = std::static_pointer_cast<PointCloudNode>(node);
-
-    auto point_cloud = point_cloud_node->GetPointCloud();
-    if (point_cloud != nullptr)
-    {
-      if (point_cloud_node->NeedUpdateBuffer())
-      {
-        auto n = point_cloud->NumPoints();
-        point_cloud_buffer_.CopyFrom(point_cloud->GetPointBuffer(), 0, 3 * n);
-        point_cloud_buffer_.CopyFrom(point_cloud->GetColorBuffer(), 3 * n, 3 * n);
-        point_cloud_buffer_.Update();
-        point_cloud_vao_.BufferPointer(0, 3, point_cloud_buffer_);
-        point_cloud_vao_.BufferPointer(1, 3, point_cloud_buffer_, 0, 3 * n);
-        point_cloud_vao_.SetVertexCount(n);
-
-        point_cloud_node->FinishUpdateBuffer();
-      }
-
-      // TODO: switch color and depth shader
-      if (current_program_ == program_color_camera_)
-      {
-        program_color_point_cloud_->Use();
-        program_color_point_cloud_->UniformMatrix4f("model", transform.cast<float>().matrix());
-      }
-      else if (current_program_ == program_depth_camera_)
-      {
-        program_depth_point_cloud_->Use();
-        program_depth_point_cloud_->UniformMatrix4f("model", transform.cast<float>().matrix());
-      }
-
-      point_cloud_vao_.Draw();
-
-      current_program_->Use();
-    }
+    point_cloud_node_ = std::static_pointer_cast<PointCloudNode>(node);
+    point_cloud_ = point_cloud_node_->GetPointCloud();
+    point_cloud_transform_ = point_cloud_node_->GetTransform();
   }
   else if (node->IsHumanLabelNode())
   {
@@ -397,9 +373,78 @@ void Renderer::TraverseSceneNode(std::shared_ptr<SceneNode> node, Affine3d trans
     TraverseSceneNode(child_node, transform * child_node->GetTransform());
 }
 
-void Renderer::DrawHumanLabelNodes()
+void Renderer::DrawMeshesColor()
 {
-  if (human_label_ == nullptr)
+  for (const auto& pair : meshes_to_draw_)
+  {
+    const auto& mesh_filename = pair.first;
+    const auto& mesh_transform = pair.second;
+
+    program_color_camera_->UniformMatrix4f("model", mesh_transform.cast<float>().matrix());
+    program_color_camera_->Uniform1i("has_diffuse_texture", 1);
+    program_color_camera_->Uniform3f("material.specular", Vector3f(1.f, 1.f, 1.f));
+    program_color_camera_->Uniform1f("material.shininess", 0.55);
+    mesh_objects_[mesh_filename].Draw();
+  }
+}
+
+void Renderer::DrawMeshesDepth()
+{
+  for (const auto& pair : meshes_to_draw_)
+  {
+    const auto& mesh_filename = pair.first;
+    const auto& mesh_transform = pair.second;
+
+    program_depth_camera_->UniformMatrix4f("model", mesh_transform.cast<float>().matrix());
+    mesh_objects_[mesh_filename].Draw();
+  }
+}
+
+void Renderer::UpdatePointCloudBuffers()
+{
+  if (point_cloud_node_ == nullptr || point_cloud_ == nullptr)
+    return;
+
+  // Buffer update
+  if (point_cloud_node_->NeedUpdateBuffer())
+  {
+    auto n = point_cloud_->NumPoints();
+    point_cloud_buffer_.CopyFrom(point_cloud_->GetPointBuffer(), 0, 3 * n);
+    point_cloud_buffer_.CopyFrom(point_cloud_->GetColorBuffer(), 3 * n, 3 * n);
+    point_cloud_buffer_.Update();
+    point_cloud_vao_.BufferPointer(0, 3, point_cloud_buffer_);
+    point_cloud_vao_.BufferPointer(1, 3, point_cloud_buffer_, 0, 3 * n);
+    point_cloud_vao_.SetVertexCount(n);
+
+    point_cloud_node_->FinishUpdateBuffer();
+  }
+}
+
+void Renderer::DrawPointCloudColor()
+{
+  if (point_cloud_node_ == nullptr || point_cloud_ == nullptr)
+    return;
+
+  program_color_point_cloud_->Use();
+  program_color_point_cloud_->UniformMatrix4f("model", point_cloud_transform_.cast<float>().matrix());
+
+  point_cloud_vao_.Draw();
+}
+
+void Renderer::DrawPointCloudDepth()
+{
+  if (point_cloud_node_ == nullptr || point_cloud_ == nullptr)
+    return;
+
+  program_depth_point_cloud_->Use();
+  program_depth_point_cloud_->UniformMatrix4f("model", point_cloud_transform_.cast<float>().matrix());
+
+  point_cloud_vao_.Draw();
+}
+
+void Renderer::UpdateHumanLabelBuffers()
+{
+  if (human_label_node_ == nullptr || human_label_ == nullptr)
     return;
 
   // Buffer udpate
@@ -451,6 +496,14 @@ void Renderer::DrawHumanLabelNodes()
   }
   human_label_edge_elements_.Update();
   human_label_edge_vao_.SetDrawElementMode(VertexArray::DrawMode::LINES, human_label_edge_elements_, index);
+}
+
+void Renderer::DrawHumanLabelColor()
+{
+  if (human_label_node_ == nullptr || human_label_ == nullptr)
+    return;
+
+  glDisable(GL_DEPTH_TEST);
 
   program_human_edge_->Use();
   program_human_edge_->UniformMatrix4f("model", human_label_transform_.cast<float>().matrix());
@@ -460,5 +513,26 @@ void Renderer::DrawHumanLabelNodes()
   program_color_point_cloud_->UniformMatrix4f("model", human_label_transform_.cast<float>().matrix());
   program_color_point_cloud_->Uniform1f("point_size", 3.f);
   human_label_point_vao_.Draw();
+
+  glEnable(GL_DEPTH_TEST);
+}
+
+void Renderer::DrawHumanLabelDepth()
+{
+  if (human_label_node_ == nullptr || human_label_ == nullptr)
+    return;
+
+  glDisable(GL_DEPTH_TEST);
+
+  program_human_edge_->Use();
+  program_human_edge_->UniformMatrix4f("model", human_label_transform_.cast<float>().matrix());
+  human_label_edge_vao_.Draw();
+
+  program_depth_point_cloud_->Use();
+  program_depth_point_cloud_->UniformMatrix4f("model", human_label_transform_.cast<float>().matrix());
+  program_depth_point_cloud_->Uniform1f("point_size", 3.f);
+  human_label_point_vao_.Draw();
+
+  glEnable(GL_DEPTH_TEST);
 }
 }

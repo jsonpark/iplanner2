@@ -303,6 +303,30 @@ void Engine::Initialize()
 
   renderer_->SetScene(scene_);
 
+
+  // Light
+  Light light;
+  light.type = Light::Type::Directional;
+  light.position = Vector3f(0.f, 0.f, 1.f);
+  light.ambient = Vector3f(0.1f, 0.1f, 0.1f);
+  light.diffuse = Vector3f(0.1f, 0.1f, 0.1f);
+  light.specular = Vector3f(0.2f, 0.2f, 0.2f);
+
+  scene_->AddLight(light);
+
+  light.position = Vector3f(-1.f, -1.f, 0.f);
+  scene_->AddLight(light);
+
+  light.position = Vector3f(-1.f, 1.f, 0.f);
+  scene_->AddLight(light);
+
+  light.position = Vector3f(1.f, -1.f, 0.f);
+  scene_->AddLight(light);
+
+  light.position = Vector3f(1.f, 1.f, 0.f);
+  scene_->AddLight(light);
+
+
   // Robot model
   RobotModelLoader robot_model_loader;
   robot_model_loader.SetPackageDirectory("..\\..\\fetch_ros");

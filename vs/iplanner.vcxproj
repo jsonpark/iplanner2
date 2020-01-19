@@ -309,6 +309,8 @@
   <ItemGroup>
     <None Include="..\..\dataset\watch-n-patch\kitchen1\data_01-05-11\body.struct" />
     <None Include="..\..\fetch_ros\fetch_description\robots\fetch.urdf" />
+    <None Include="..\.gitignore" />
+    <None Include="..\README.md" />
     <None Include="..\src\shader\color_camera.frag" />
     <None Include="..\src\shader\color_camera.vert" />
     <None Include="..\src\shader\color_depth.frag" />

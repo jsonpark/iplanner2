@@ -65,6 +65,9 @@
     <Filter Include="shader">
       <UniqueIdentifier>{e6708af9-2009-494b-ad9a-2e3c411c10b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="git">
+      <UniqueIdentifier>{8c738ecd-413d-4d60-98c7-b75ada21e1af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\lib\glad\glad.c">
@@ -376,6 +379,12 @@
     </None>
     <None Include="..\src\shader\human_edge.vert">
       <Filter>shader</Filter>
+    </None>
+    <None Include="..\.gitignore">
+      <Filter>git</Filter>
+    </None>
+    <None Include="..\README.md">
+      <Filter>git</Filter>
     </None>
   </ItemGroup>
 </Project>

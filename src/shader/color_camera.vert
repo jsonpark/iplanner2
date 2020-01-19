@@ -12,12 +12,15 @@ layout (binding = 0, std140) uniform Camera
 
 uniform mat4 model;
 
-out vec3 vertex_position;
-out vec2 vertex_tex_coord;
+out vec3 frag_position;
+out vec3 frag_normal;
+out vec2 frag_tex_coord;
 
 void main()
 {
   gl_Position = projection * view * model * vec4(position, 1.f);
-  vertex_position = vec3(model * vec4(position, 1.f));
-  vertex_tex_coord = tex_coord;
+  vec4 frag_homo_position = model * vec4(position, 1.f);
+  frag_position = frag_homo_position.xyz / frag_homo_position.w;
+  frag_normal = mat3(transpose(inverse(model))) * normal;
+  frag_tex_coord = tex_coord;
 }

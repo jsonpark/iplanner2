@@ -64,12 +64,12 @@ some\where\watch-n-patch
 
 1. Converting `.mat` files to raw data
 
-Set the directory and conversion options in `main.cc` of `mat_convert`.
+   Set the directory and conversion options in `main.cc` of `mat_convert`.
 
-Build and run `mat_convert`.
+   Build and run `mat_convert`.
 
 2. Running the motion planner
 
-Set directories in `engine.cc` and other codes of `iplanner`.
+   Set directories in `engine.cc` and other codes of `iplanner`.
 
-(Hard-coded directories should be replaced with strings from configuration files.)
+   (Hard-coded directories should be replaced with strings from configuration files.)

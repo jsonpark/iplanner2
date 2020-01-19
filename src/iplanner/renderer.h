@@ -12,6 +12,7 @@
 #include "iplanner/mesh/mesh_object.h"
 #include "iplanner/human/human_label.h"
 #include "iplanner/scene/human_label_node.h"
+#include "iplanner/scene/point_cloud_node.h"
 
 struct GLFWwindow;
 
@@ -53,14 +54,20 @@ private:
   void UpdateCameraUniformFromScene();
   void UpdateLightUniformFromScene();
 
-  std::shared_ptr<Program> current_program_;
   void TraverseSceneNode(std::shared_ptr<SceneNode> node, Affine3d transform = Affine3d::Identity());
 
-  void DrawHumanLabelNodes();
+  void DrawMeshesColor();
+  void DrawMeshesDepth();
 
-  // Test draw
-  MeshObject mesh1_{ "..\\..\\fetch_ros\\fetch_description\\meshes\\base_link.dae" };
-  MeshObject mesh2_{ "..\\..\\fetch_ros\\fetch_description\\meshes\\r_wheel_link.STL" };
+  // Assuming only one point cloud in the scene
+  void UpdatePointCloudBuffers();
+  void DrawPointCloudColor();
+  void DrawPointCloudDepth();
+
+  // Assuming only one human label in the scene
+  void UpdateHumanLabelBuffers();
+  void DrawHumanLabelColor();
+  void DrawHumanLabelDepth();
 
   std::shared_ptr<Program> program_color_camera_;
   std::shared_ptr<Program> program_depth_camera_;
@@ -127,6 +134,10 @@ private:
   BufferBase<float, BufferType::ARRAY_BUFFER, BufferUsage::DYNAMIC_DRAW> point_cloud_buffer_;
   VertexArray point_cloud_vao_;
 
+  std::shared_ptr<PointCloudNode> point_cloud_node_;
+  std::shared_ptr<PointCloud> point_cloud_;
+  Affine3d point_cloud_transform_;
+
   std::shared_ptr<Program> program_color_point_cloud_;
   std::shared_ptr<Program> program_depth_point_cloud_;
 
@@ -141,6 +152,9 @@ private:
   VertexArray human_label_edge_vao_;
 
   std::shared_ptr<Program> program_human_edge_;
+
+  // Mesh files to draw
+  std::vector<std::pair<std::string, Affine3d>> meshes_to_draw_;
 };
 }
 
