@@ -19,6 +19,10 @@ void Dataset::SelectSequence(const std::string& name)
 {
 }
 
+void Dataset::SelectFrame(int index)
+{
+}
+
 int Dataset::FrameRate()
 {
   return 60;

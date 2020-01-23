@@ -1,15 +1,10 @@
-#ifndef IPLANNER_DATASET_DATASET_WNP_H_
-#define IPLANNER_DATASET_DATASET_WNP_H_
+#ifndef IPLANNER_DATASET_DATASET_OCCLUSION_H_
+#define IPLANNER_DATASET_DATASET_OCCLUSION_H_
 
 #include "iplanner/dataset/dataset.h"
 
 #include <type_traits>
 #include <array>
-
-/*
-#include <MatlabEngine.hpp>
-#include <MatlabExecutionInterface.hpp>
-*/
 
 #include "iplanner/types.h"
 #include "iplanner/human/human_model.h"
@@ -17,30 +12,20 @@
 
 namespace iplanner
 {
-class Wnp : public Dataset
+class DatasetOcclusion : public Dataset
 {
 private:
-  static const std::vector<std::string> scene_names_;
+  constexpr static int num_joints_ = 15;
 
 public:
-  struct Joint
-  {
-    int tracking_state;
-    Vector3d camera;
-    Vector2d color;
-    Vector2d depth;
-    Quaterniond rotation;
-    Vector3d pcloud;
-  };
-
-  using Joints = std::array<Joint, 25>;
+  using Joints = std::array<Vector3d, num_joints_>;
 
 public:
-  Wnp() = delete;
+  DatasetOcclusion() = delete;
 
-  explicit Wnp(const std::string& directory);
+  explicit DatasetOcclusion(const std::string& directory);
 
-  ~Wnp();
+  ~DatasetOcclusion();
 
   auto GetHumanModel() const
   {
@@ -72,8 +57,6 @@ public:
 
 private:
   void LoadBody();
-  void LoadBodyFromMatFile();
-  void LoadBodyFromStructFile();
 
   const std::string directory_;
 
@@ -96,16 +79,9 @@ private:
 
   // Data for the whole sequence
   std::vector<Joints> joints_;
-  std::vector<bool> is_body_tracked_;
-
-  // Matlab engine
-  /*
-  matlab::execution::FutureResult<std::unique_ptr<matlab::engine::MATLABEngine>> matlab_future_;
-  std::unique_ptr<matlab::engine::MATLABEngine> matlab_;
-  */
 
   bool body_loaded_ = false;
 };
 }
 
-#endif // IPLANNER_DATASET_DATASET_WNP_H_
+#endif // IPLANNER_DATASET_DATASET_OCCLUSION_H_

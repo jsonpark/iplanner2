@@ -8,7 +8,10 @@ namespace iplanner
 class UtKinect : public Dataset
 {
 public:
-  UtKinect();
+  UtKinect() = delete;
+
+  explicit UtKinect(const std::string& directory);
+
   ~UtKinect();
 
   int NumSequences() override;
@@ -31,6 +34,8 @@ public:
   bool NextFrame() override;
 
 private:
+  std::string directory_;
+
   std::vector<std::string> sequence_names_;
   int current_sequence_ = -1;
 

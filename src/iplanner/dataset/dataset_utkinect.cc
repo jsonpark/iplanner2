@@ -27,8 +27,6 @@ const char directory_character = '\\';
 const char directory_character = '/';
 #endif
 
-const std::string directory = std::string("..") + directory_character + "data" + directory_character + "utkinect" + directory_character;
-
 // Extract file index XXXX from filename format "colorImgXXXX.jpg" and "depthImgXXXX.xml"
 int ExtractFileIndex(const std::string& filename)
 {
@@ -45,7 +43,8 @@ int ExtractFileIndex(const std::string& filename)
 }
 }
 
-UtKinect::UtKinect()
+UtKinect::UtKinect(const std::string& directory)
+  : directory_(directory)
 {
   // Get sequence names
   for (auto& it : fs::directory_iterator(directory + "RGB" + directory_character))
@@ -103,7 +102,7 @@ void UtKinect::SelectSequence(int idx)
 
   rgb_image_indices_.resize(10000);
   std::fill(rgb_image_indices_.begin(), rgb_image_indices_.end(), -1);
-  for (auto& it : fs::directory_iterator(directory + "RGB" + directory_character + sequence_names_[idx] + directory_character))
+  for (auto& it : fs::directory_iterator(directory_ + directory_character + "RGB" + directory_character + sequence_names_[idx] + directory_character))
   {
     const auto& path = it.path();
     const auto& filename = path.filename().string();
@@ -113,7 +112,7 @@ void UtKinect::SelectSequence(int idx)
 
   depth_image_indices_.resize(10000, -1);
   std::fill(depth_image_indices_.begin(), depth_image_indices_.end(), -1);
-  for (auto& it : fs::directory_iterator(directory + "depth" + directory_character + sequence_names_[idx] + directory_character))
+  for (auto& it : fs::directory_iterator(directory_ + directory_character + "depth" + directory_character + sequence_names_[idx] + directory_character))
   {
     const auto& path = it.path();
     const auto& filename = path.filename().string();
@@ -206,7 +205,7 @@ std::vector<unsigned char> UtKinect::GetRgbImage()
 
   cached_rgb_image_index_ = rgb_image_indices_[current_frame_];
 
-  auto filename = directory + "RGB" + directory_character + sequence_names_[current_sequence_] + directory_character + "colorImg" + std::to_string(cached_rgb_image_index_) + ".jpg";
+  auto filename = directory_ + directory_character + "RGB" + directory_character + sequence_names_[current_sequence_] + directory_character + "colorImg" + std::to_string(cached_rgb_image_index_) + ".jpg";
   int width, height, components;
   stbi_set_flip_vertically_on_load(true);
   unsigned char* data = stbi_load(filename.c_str(), &width, &height, &components, 0);
@@ -224,7 +223,7 @@ std::vector<unsigned short> UtKinect::GetDepthImage()
   cached_depth_image_index_ = depth_image_indices_[current_frame_];
 
   // TODO
-  auto filename = directory + "depth" + directory_character + sequence_names_[current_sequence_] + directory_character + "depthImg" + std::to_string(cached_depth_image_index_) + ".xml";
+  auto filename = directory_ + directory_character + "depth" + directory_character + sequence_names_[current_sequence_] + directory_character + "depthImg" + std::to_string(cached_depth_image_index_) + ".xml";
 
   return cached_depth_image_;
 }

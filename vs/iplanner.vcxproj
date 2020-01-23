@@ -231,6 +231,7 @@
     <ClCompile Include="..\lib\tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="..\src\iplanner\config\config.cc" />
     <ClCompile Include="..\src\iplanner\dataset\dataset.cc" />
+    <ClCompile Include="..\src\iplanner\dataset\dataset_occlusion.cc" />
     <ClCompile Include="..\src\iplanner\dataset\dataset_utkinect.cc" />
     <ClCompile Include="..\src\iplanner\dataset\dataset_wnp.cc" />
     <ClCompile Include="..\src\iplanner\data\point_cloud.cc" />
@@ -272,6 +273,7 @@
     <ClInclude Include="..\lib\tinyxml2\tinyxml2.h" />
     <ClInclude Include="..\src\iplanner\config\config.h" />
     <ClInclude Include="..\src\iplanner\dataset\dataset.h" />
+    <ClInclude Include="..\src\iplanner\dataset\dataset_occlusion.h" />
     <ClInclude Include="..\src\iplanner\dataset\dataset_utkinect.h" />
     <ClInclude Include="..\src\iplanner\dataset\dataset_wnp.h" />
     <ClInclude Include="..\src\iplanner\data\point_cloud.h" />
@@ -310,6 +312,7 @@
     <ClInclude Include="..\src\iplanner\utils\json.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\dataset\occlusion\abdallah2BodyWalk1\qualisys.tsv" />
     <None Include="..\..\dataset\watch-n-patch\kitchen1\data_01-05-11\body.struct" />
     <None Include="..\..\fetch_ros\fetch_description\robots\fetch.urdf" />
     <None Include="..\.gitignore" />
@@ -339,6 +342,10 @@
     <None Include="..\src\shader\texture_3d.vert" />
     <None Include="..\src\shader\tutorial.frag" />
     <None Include="..\src\shader\tutorial.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\dataset\occlusion\abdallah2BodyWalk1\groundTruth.txt" />
+    <Text Include="..\..\dataset\occlusion\abdallah2BodyWalk1\rgb_depth_pos.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

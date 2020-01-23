@@ -13,6 +13,7 @@
 #include "iplanner/scene/point_cloud_node.h"
 #include "iplanner/scene/human_label_node.h"
 #include "iplanner/dataset/dataset_wnp.h"
+#include "iplanner/dataset/dataset_utkinect.h"
 #include "iplanner/sensor/kinect_v2.h"
 
 struct GLFWwindow;
@@ -253,6 +254,8 @@ private:
 
   // Dataset
   std::shared_ptr<Wnp> dataset_wnp_;
+  std::shared_ptr<UtKinect> dataset_utkinect_;
+  std::shared_ptr<Dataset> dataset_;
   KinectV2 kinect_;
 
   // Human

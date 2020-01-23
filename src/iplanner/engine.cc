@@ -189,13 +189,13 @@ void Engine::Keyboard(Key key, KeyAction action, int mods)
     case Key::UP:
       animation_time_ = 0.;
       animation_start_time_ = glfwGetTime();
-      dataset_wnp_->PreviousSequence();
+      dataset_->PreviousSequence();
       break;
 
     case Key::DOWN:
       animation_time_ = 0.;
       animation_start_time_ = glfwGetTime();
-      dataset_wnp_->NextSequence();
+      dataset_->NextSequence();
       break;
 
     case Key::R:
@@ -498,6 +498,10 @@ void Engine::Initialize()
 
   // Dataset
   dataset_wnp_ = std::make_shared<Wnp>(config_.GetDatasetDirectory("wnp"));
+  dataset_utkinect_ = std::make_shared<UtKinect>(config_.GetDatasetDirectory("utkinect"));
+
+  dataset_ = dataset_wnp_;
+
   point_cloud_ = std::make_shared<PointCloud>();
 
   renderer_->CreateEmptyTexture("data_color", 1920, 1080, Texture::Usage::TEXTURE);
@@ -572,12 +576,12 @@ void Engine::Update()
   if (animation_)
   {
     animation_time_ = t;
-    auto frame_number = static_cast<int>(animation_time_ * dataset_wnp_->FrameRate());
-    dataset_wnp_->SelectFrame(frame_number);
+    auto frame_number = static_cast<int>(animation_time_ * dataset_->FrameRate());
+    dataset_->SelectFrame(frame_number);
   }
 
   // Update point cloud
-  kinect_.FeedFrame(dataset_wnp_->GetRgbImage(), dataset_wnp_->GetDepthImage());
+  kinect_.FeedFrame(dataset_->GetRgbImage(), dataset_->GetDepthImage());
   kinect_.GeneratePointCloud();
   kinect_.GetPointCloud(point_cloud_);
   point_cloud_node_->UpdateBuffer();

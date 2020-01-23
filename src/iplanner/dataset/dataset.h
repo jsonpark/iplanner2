@@ -15,6 +15,7 @@ public:
   virtual int NumSequences();
   virtual void SelectSequence(int idx);
   virtual void SelectSequence(const std::string& name);
+  virtual void SelectFrame(int index);
 
   virtual int FrameRate();
   virtual int RgbWidth();
