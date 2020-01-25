@@ -46,6 +46,7 @@ public:
   
   std::vector<unsigned char> GetImage();
 
+  void Resize(int width, int height);
   void Update(const void* pixels);
 
 private:

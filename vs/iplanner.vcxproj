@@ -308,6 +308,7 @@
     <ClInclude Include="..\src\iplanner\scene\scene_node.h" />
     <ClInclude Include="..\src\iplanner\sensor\fake_kinect.h" />
     <ClInclude Include="..\src\iplanner\sensor\kinect_v2.h" />
+    <ClInclude Include="..\src\iplanner\sensor\rgbd_camera.h" />
     <ClInclude Include="..\src\iplanner\shader\program.h" />
     <ClInclude Include="..\src\iplanner\shader\shader.h" />
     <ClInclude Include="..\src\iplanner\types.h" />

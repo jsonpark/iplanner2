@@ -2,29 +2,14 @@
 #define IPLANNER_SENSOR_KINECT_V2_H_
 
 #include "iplanner/types.h"
+#include "iplanner/sensor/rgbd_camera.h"
 #include "iplanner/data/point_cloud.h"
 
 namespace iplanner
 {
-class KinectV2
+class KinectV2 : public RgbdCamera
 {
 private:
-  struct CameraParameters
-  {
-    // Intrinsic
-    double fx;
-    double fy;
-    double cx;
-    double cy;
-
-    // Distortion
-    double k1;
-    double k2;
-    double p1;
-    double p2;
-    double k3;
-  };
-
   static const CameraParameters color_params_;
   static const CameraParameters depth_params_;
 
@@ -37,20 +22,20 @@ public:
   KinectV2();
   ~KinectV2();
 
-  void FeedFrame(std::vector<unsigned char>&& color, std::vector<unsigned short>&& depth);
-  void GeneratePointCloud();
+  void FeedFrame(std::vector<unsigned char>&& color, std::vector<unsigned short>&& depth) override;
+  void GeneratePointCloud() override;
 
-  void GetPointCloud(std::shared_ptr<PointCloud> point_cloud) const
+  void GetPointCloud(std::shared_ptr<PointCloud> point_cloud) const override
   {
     *point_cloud = point_cloud_;
   }
 
-  const auto& GetColorBuffer() const
+  const std::vector<unsigned char>& GetColorBuffer() const override
   {
     return color_;
   }
 
-  const auto& GetDepthBuffer() const
+  const std::vector<unsigned short>& GetDepthBuffer() const override
   {
     return depth_;
   }

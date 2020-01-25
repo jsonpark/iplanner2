@@ -15,7 +15,7 @@ namespace iplanner
 {
 Renderer::Renderer(Engine* engine)
   : engine_(engine),
-  point_cloud_buffer_(640 * 480 * 6),
+  point_cloud_buffer_(1920 * 1080 * 6),
   human_label_buffer_(25 * 6),
   human_label_edge_elements_(100)
 {
@@ -124,6 +124,22 @@ void Renderer::Initialize()
 
 void Renderer::Render()
 {
+  if (color_camera_resolution_changed_)
+  {
+    framebuffer_color_->Resize(color_camera_resolution_(0), color_camera_resolution_(1));
+    framebuffer_color_texture_->Resize(color_camera_resolution_(0), color_camera_resolution_(1));
+
+    color_camera_resolution_changed_ = false;
+  }
+
+  if (depth_camera_resolution_changed_)
+  {
+    framebuffer_depth_->Resize(depth_camera_resolution_(0), depth_camera_resolution_(1));
+    framebuffer_depth_texture_->Resize(depth_camera_resolution_(0), depth_camera_resolution_(1));
+
+    depth_camera_resolution_changed_ = false;
+  }
+
   UpdateCameraUniformFromScene();
   UpdateLightUniformFromScene();
 
@@ -149,8 +165,7 @@ void Renderer::Render()
   framebuffer_color_->Use();
   glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  //glViewport(0, 0, 1920, 1080);
-  glViewport(0, 0, 640, 480);
+  glViewport(0, 0, color_camera_resolution_(0), color_camera_resolution_(1));
 
   program_color_camera_->Use();
   program_color_camera_->BindUniformBuffer(0, color_camera_uniform_);
@@ -171,8 +186,7 @@ void Renderer::Render()
   unsigned int value = 80000;
   glClearBufferuiv(GL_COLOR, 0, &value);
   glClear(GL_DEPTH_BUFFER_BIT);
-  //glViewport(0, 0, 512, 424);
-  glViewport(0, 0, 640, 480);
+  glViewport(0, 0, depth_camera_resolution_(0), depth_camera_resolution_(1));
 
   program_depth_camera_->Use();
   program_depth_point_cloud_->BindUniformBuffer(0, depth_camera_uniform_);
@@ -197,7 +211,7 @@ void Renderer::Render()
     view_mode == Engine::ViewMode::VIEW)
   {
     // View camera rendering
-    glViewport(0, 0, 1280, 720);
+    glViewport(0, 0, 1280, 720); // screen size
     program_color_camera_->Use();
     program_color_camera_->BindUniformBuffer(0, view_camera_uniform_);
     program_color_camera_->Uniform3f("eye_position", view_camera->GetEye());
@@ -215,25 +229,25 @@ void Renderer::Render()
   {
   case Engine::ViewMode::ALL:
     // Color camera image from robot camera
-    glViewport(0, 0, 1920 / 4, 1080 / 4);
+    glViewport(0, 0, color_camera_resolution_(0) / 4, color_camera_resolution_(1) / 4);
     program_color_screen_->Use();
     framebuffer_vao_.SetTexture(0, framebuffer_color_texture_);
     framebuffer_vao_.Draw();
 
     // Depth camera image from robot camera
-    glViewport(1920 / 4 + 10, 0, 512 / 2, 424 / 2);
+    glViewport(color_camera_resolution_(0) / 4 + 10, 0, depth_camera_resolution_(0) / 2, depth_camera_resolution_(1) / 2);
     program_depth_screen_->Use();
     framebuffer_vao_.SetTexture(0, framebuffer_depth_texture_);
     framebuffer_vao_.Draw();
 
     // Color camera image from dataset
-    glViewport(0, 1080 / 4 + 10, 1920 / 4, 1080 / 4);
+    glViewport(0, color_camera_resolution_(1) / 4 + 10, color_camera_resolution_(0) / 4, color_camera_resolution_(1) / 4);
     program_color_screen_->Use();
     framebuffer_vao_.SetTexture(0, textures_.find("data_color")->second);
     framebuffer_vao_.Draw();
 
     // Depth camera image from dataset
-    glViewport(1920 / 4 + 10, 424 / 2 + 10, 512 / 2, 424 / 2);
+    glViewport(color_camera_resolution_(0) / 4 + 10, depth_camera_resolution_(1) / 2 + 10, depth_camera_resolution_(0) / 2, depth_camera_resolution_(1) / 2);
     program_depth_screen_->Use();
     data_depth_vao_.SetTexture(0, textures_.find("data_depth")->second);
     data_depth_vao_.Draw();
@@ -243,7 +257,7 @@ void Renderer::Render()
 
   case Engine::ViewMode::COLOR_IMAGE:
     // Color camera image from dataset
-    glViewport(0, 0, 1280, 720);
+    glViewport(0, 0, color_camera_resolution_(0), color_camera_resolution_(1));
     program_color_screen_->Use();
     framebuffer_vao_.SetTexture(0, textures_.find("data_color")->second);
     framebuffer_vao_.Draw();
@@ -251,7 +265,7 @@ void Renderer::Render()
 
   case Engine::ViewMode::COLOR_VIEW:
     // Color camera image from robot camera
-    glViewport(0, 0, 1280, 720);
+    glViewport(0, 0, color_camera_resolution_(0), color_camera_resolution_(1));
     program_color_screen_->Use();
     framebuffer_vao_.SetTexture(0, framebuffer_color_texture_);
     framebuffer_vao_.Draw();
@@ -259,7 +273,7 @@ void Renderer::Render()
 
   case Engine::ViewMode::DEPTH_IMAGE:
     // Depth camera image from dataset
-    glViewport(0, 0, 512, 424);
+    glViewport(0, 0, depth_camera_resolution_(0), depth_camera_resolution_(1));
     program_depth_screen_->Use();
     data_depth_vao_.SetTexture(0, textures_.find("data_depth")->second);
     data_depth_vao_.Draw();
@@ -267,7 +281,7 @@ void Renderer::Render()
 
   case Engine::ViewMode::DEPTH_VIEW:
     // Depth camera image from robot camera
-    glViewport(0, 0, 512, 424);
+    glViewport(0, 0, depth_camera_resolution_(0), depth_camera_resolution_(1));
     program_depth_screen_->Use();
     framebuffer_vao_.SetTexture(0, framebuffer_depth_texture_);
     framebuffer_vao_.Draw();
@@ -397,6 +411,29 @@ void Renderer::SetScene(std::shared_ptr<Scene> scene)
 void Renderer::CreateEmptyTexture(const std::string& name, int width, int height, Texture::Usage usage)
 {
   textures_.emplace(name, std::make_shared<Texture>(width, height, usage));
+}
+
+void Renderer::ResizeTexture(const std::string& name, int width, int height)
+{
+  auto it = textures_.find(name);
+  if (it != textures_.cend())
+    it->second->Resize(width, height);
+}
+
+void Renderer::SetColorCameraResolution(int width, int height)
+{
+  color_camera_resolution_(0) = width;
+  color_camera_resolution_(1) = height;
+
+  color_camera_resolution_changed_ = true;
+}
+
+void Renderer::SetDepthCameraResolution(int width, int height)
+{
+  depth_camera_resolution_(0) = width;
+  depth_camera_resolution_(1) = height;
+
+  depth_camera_resolution_changed_ = true;
 }
 
 void Renderer::TraverseSceneNode(std::shared_ptr<SceneNode> node, Affine3d transform)

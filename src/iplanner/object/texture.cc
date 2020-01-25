@@ -269,4 +269,72 @@ void Texture::Update(const void* pixels)
 
   Unbind();
 }
+
+void Texture::Resize(int width, int height)
+{
+  width_ = width;
+  height_ = height;
+
+  GLenum gl_internal_format = 0;
+  GLenum gl_format = 0;
+  GLenum gl_type = 0;
+
+  switch (usage_)
+  {
+  case Usage::TEXTURE:
+  case Usage::COLOR_FRAMEBUFFER:
+    switch (num_channels_)
+    {
+    case 1:
+      gl_format = GL_R;
+      break;
+
+    case 3:
+      gl_format = GL_RGB;
+      break;
+
+    case 4:
+      gl_format = GL_RGBA;
+      break;
+    }
+    gl_internal_format = gl_format;
+    gl_type = GL_UNSIGNED_BYTE;
+    break;
+
+  case Usage::U16_TEXTURE:
+    gl_internal_format = GL_R16UI;
+    gl_format = GL_RED_INTEGER;
+    gl_type = GL_UNSIGNED_SHORT;
+    break;
+
+  case Usage::DEPTH_FRAMEBUFFER:
+    gl_internal_format = GL_DEPTH_COMPONENT;
+    gl_format = GL_DEPTH_COMPONENT;
+    gl_type = GL_FLOAT;
+    break;
+
+  case Usage::U32_FRAMEBUFFER:
+    gl_internal_format = GL_R32UI;
+    gl_format = GL_RED_INTEGER;
+    gl_type = GL_UNSIGNED_INT;
+    break;
+
+  case Usage::DEPTH_STENCIL_FRAMEBUFFER:
+    gl_internal_format = GL_DEPTH_STENCIL;
+    gl_format = GL_DEPTH_STENCIL;
+    gl_type = GL_UNSIGNED_INT_24_8;
+    break;
+
+  default:
+    return;
+  }
+
+  Bind();
+
+  glTexImage2D(GL_TEXTURE_2D, 0, gl_internal_format, width_, height_, 0, gl_format, gl_type, 0);
+
+  glGenerateMipmap(GL_TEXTURE_2D);
+
+  Unbind();
+}
 }

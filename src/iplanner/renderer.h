@@ -38,6 +38,10 @@ public:
   void SetScene(std::shared_ptr<Scene> scene);
 
   void CreateEmptyTexture(const std::string& name, int width, int height, Texture::Usage usage = Texture::Usage::TEXTURE);
+  void ResizeTexture(const std::string& name, int width, int height);
+
+  void SetColorCameraResolution(int width, int height);
+  void SetDepthCameraResolution(int width, int height);
 
   template<typename T>
   void UpdateTexture(const std::string& name, const std::vector<T>& buffer)
@@ -82,10 +86,14 @@ private:
   // Color framebuffer
   std::shared_ptr<Framebuffer> framebuffer_color_;
   std::shared_ptr<Texture> framebuffer_color_texture_;
+  Vector2i color_camera_resolution_ = Vector2i(640, 480);
+  bool color_camera_resolution_changed_ = false;
 
   // Depth framebuffer
   std::shared_ptr<Framebuffer> framebuffer_depth_;
   std::shared_ptr<Texture> framebuffer_depth_texture_;
+  Vector2i depth_camera_resolution_ = Vector2i(640, 480);
+  bool depth_camera_resolution_changed_ = false;
 
   Buffer<float> framebuffer_vertices_
   {

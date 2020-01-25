@@ -25,15 +25,37 @@ void Framebuffer::Resize(int width, int height)
   {
     glDeleteFramebuffers(1, &id_);
 
-    texture_colors_.clear();
-    texture_depth_ = nullptr;
-    texture_depth_stencil_ = nullptr;
-    depth_renderbuffer_ = nullptr;
+    Generate();
+
+    for (int i = 0; i < texture_colors_.size(); i++)
+    {
+      const auto& texture_color = texture_colors_[i];
+      texture_color->Resize(width, height);
+
+      // Re-attach the texture to the framebuffer after resizing
+      Bind();
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texture_color->Id(), 0);
+      Unbind();
+    }
+
+    if (texture_depth_ != nullptr)
+    {
+      texture_depth_ = nullptr;
+      CreateDepthTexture();
+    }
+
+    if (texture_depth_stencil_ != nullptr)
+    {
+      texture_depth_stencil_ = nullptr;
+      CreateDepthStencilTexture();
+    }
+
+    if (depth_renderbuffer_ != nullptr)
+    {
+      depth_renderbuffer_ = nullptr;
+      CreateDepthStencilRenderbuffer();
+    }
   }
-
-  Generate();
-
-  // TODO: 
 }
 
 void Framebuffer::Use()
@@ -48,6 +70,8 @@ void Framebuffer::Use()
   }
 
   glDrawBuffers(buffers.size(), buffers.data());
+
+  glViewport(0, 0, width_, height_);
 }
 
 void Framebuffer::UseScreen()

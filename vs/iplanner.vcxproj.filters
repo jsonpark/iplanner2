@@ -333,6 +333,9 @@
     <ClInclude Include="..\src\iplanner\sensor\fake_kinect.h">
       <Filter>src\iplanner\sensor</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\iplanner\sensor\rgbd_camera.h">
+      <Filter>src\iplanner\sensor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\shader\tutorial.vert">

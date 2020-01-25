@@ -3,6 +3,7 @@
 #include <iostream>
 #include <thread>
 #include <stdexcept>
+#include <chrono>
 
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
@@ -150,6 +151,7 @@ void Engine::Keyboard(Key key, KeyAction action, int mods)
   {
     switch (key)
     {
+      // Play/pause video
     case Key::SPACE:
       if (!animation_)
       {
@@ -157,11 +159,10 @@ void Engine::Keyboard(Key key, KeyAction action, int mods)
         animation_start_time_ = glfwGetTime() - animation_time_;
       }
       else
-      {
         animation_ = false;
-      }
       break;
 
+      // Number 1-6 selects view mode
     case Key::NUM1:
       view_mode_ = ViewMode::ALL;
       break;
@@ -186,6 +187,7 @@ void Engine::Keyboard(Key key, KeyAction action, int mods)
       view_mode_ = ViewMode::DEPTH_VIEW;
       break;
 
+      // Keyboard up/down changes sequence
     case Key::UP:
       animation_time_ = 0.;
       animation_start_time_ = glfwGetTime();
@@ -198,13 +200,58 @@ void Engine::Keyboard(Key key, KeyAction action, int mods)
       dataset_->NextSequence();
       break;
 
+      // Replay
     case Key::R:
       animation_time_ = 0.;
       animation_start_time_ = glfwGetTime();
       break;
 
+      // Save sample images
     case Key::S:
       SaveImageSamples();
+      break;
+
+      // Numpad (KP_x) sets a dataset
+    case Key::KP_1:
+      if (dataset_ != dataset_utkinect_)
+      {
+        dataset_ = dataset_utkinect_;
+        rgbd_camera_ = kinect_; // TODO: change to kinect v1
+
+        animation_time_ = 0.;
+        animation_start_time_ = glfwGetTime();
+        animation_ = false;
+
+        dataset_changed_ = true;
+      }
+      break;
+
+    case Key::KP_2:
+      if (dataset_ != dataset_wnp_)
+      {
+        dataset_ = dataset_wnp_;
+        rgbd_camera_ = kinect_;
+
+        animation_time_ = 0.;
+        animation_start_time_ = glfwGetTime();
+        animation_ = false;
+
+        dataset_changed_ = true;
+      }
+      break;
+
+    case Key::KP_3:
+      if (dataset_ != dataset_occlusion_)
+      {
+        dataset_ = dataset_occlusion_;
+        rgbd_camera_ = fake_kinect_;
+
+        animation_time_ = 0.;
+        animation_start_time_ = glfwGetTime();
+        animation_ = false;
+
+        dataset_changed_ = true;
+      }
       break;
     }
   }
@@ -295,6 +342,8 @@ void Engine::Run()
   {
     using namespace std::chrono_literals;
 
+    auto timestamp = std::chrono::system_clock::now();
+
     glfwPollEvents();
 
     Update();
@@ -309,7 +358,7 @@ void Engine::Run()
     }
 
     // Let CPU be idle for a short time window
-    std::this_thread::sleep_for(1ms);
+    std::this_thread::sleep_until(timestamp + (1s / 120));
   }
 
   glfwTerminate();
@@ -321,6 +370,8 @@ void Engine::Initialize()
   glEnable(GL_MULTISAMPLE);
 
   renderer_ = std::make_unique<Renderer>(this);
+  renderer_->SetColorCameraResolution(640, 480);
+  renderer_->SetDepthCameraResolution(640, 480);
   renderer_->Initialize();
 
   constexpr double pi = 3.1415926535897932384626433832795;
@@ -332,16 +383,13 @@ void Engine::Initialize()
   // Kinect V2 has color image resolution of 1920 x 1080 pixels and a fov of 84.1 x 53.8 resulting in an average of about 22 x 20 pixels per degree.
   // https://smeenk.com/kinect-field-of-view-comparison/
   color_camera_ = std::make_shared<Camera>();
-  //color_camera_->SetAspect(std::atan(84.1f / 180.f * pi) / std::atan(53.8f / 180.f * pi));
   color_camera_->SetAspect(640.f / 480.f);
-  //color_camera_->SetAspect(1920.f / 1080.f);
   color_camera_->SetFovy(53.8f / 180.f * pi);
   color_camera_->SetFar(10.f);
 
   // Kinect V2 has a depth image resolution of 512 x 424 pixels with a fov of 70.6 x 60 degrees resulting in an average of about 7 x 7 pixels per degree
   depth_camera_ = std::make_shared<Camera>();
-  depth_camera_->SetAspect(std::atan(70.6f / 180.f * pi) / std::atan(60.f / 180.f * pi));
-  //depth_camera_->SetAspect(512.f / 424.f);
+  depth_camera_->SetAspect(640.f / 480.f);
   depth_camera_->SetFovy(60.f / 180.f * pi);
   depth_camera_->SetFar(10.f);
 
@@ -512,8 +560,13 @@ void Engine::Initialize()
   dataset_utkinect_ = std::make_shared<UtKinect>(config_.GetDatasetDirectory("utkinect"));
   dataset_occlusion_ = std::make_shared<DatasetOcclusion>(config_.GetDatasetDirectory("occlusion"));
 
-  //dataset_ = dataset_wnp_;
   dataset_ = dataset_occlusion_;
+
+  // Camera
+  kinect_ = std::make_shared<KinectV2>();
+  fake_kinect_ = std::make_shared<FakeKinect>();
+
+  rgbd_camera_ = fake_kinect_;
 
   point_cloud_ = std::make_shared<PointCloud>();
 
@@ -610,6 +663,23 @@ void Engine::Update()
 
   double t = glfwGetTime() - animation_start_time_;
 
+  if (dataset_changed_)
+  {
+    Vector2i color_resolution{ dataset_->RgbWidth(), dataset_->RgbHeight() };
+    Vector2i depth_resolution{ dataset_->DepthWidth(), dataset_->DepthHeight() };
+
+    color_camera_->SetAspect(static_cast<float>(color_resolution(0)) / color_resolution(1));
+    depth_camera_->SetAspect(static_cast<float>(depth_resolution(0)) / depth_resolution(1));
+
+    renderer_->SetColorCameraResolution(color_resolution(0), color_resolution(1));
+    renderer_->SetDepthCameraResolution(depth_resolution(0), depth_resolution(1));
+
+    renderer_->ResizeTexture("data_color", color_resolution(0), color_resolution(1));
+    renderer_->ResizeTexture("data_depth", depth_resolution(0), depth_resolution(1));
+
+    dataset_changed_ = false;
+  }
+
   if (animation_)
   {
     animation_time_ = t;
@@ -618,19 +688,14 @@ void Engine::Update()
   }
 
   // Update point cloud
-  /*
-  kinect_.FeedFrame(dataset_->GetRgbImage(), dataset_->GetDepthImage());
-  kinect_.GeneratePointCloud();
-  kinect_.GetPointCloud(point_cloud_);
-  */
-  fake_kinect_.FeedFrame(dataset_->GetRgbImage(), dataset_->GetDepthImage());
-  fake_kinect_.GeneratePointCloud();
-  fake_kinect_.GetPointCloud(point_cloud_);
+  rgbd_camera_->FeedFrame(dataset_->GetRgbImage(), dataset_->GetDepthImage());
+  rgbd_camera_->GeneratePointCloud();
+  rgbd_camera_->GetPointCloud(point_cloud_);
   point_cloud_node_->UpdateBuffer();
 
   // Update color/depth images from Kinect sensor
-  renderer_->UpdateTexture("data_color", fake_kinect_.GetColorBuffer());
-  renderer_->UpdateTexture("data_depth", fake_kinect_.GetDepthBuffer());
+  renderer_->UpdateTexture("data_color", rgbd_camera_->GetColorBuffer());
+  renderer_->UpdateTexture("data_depth", rgbd_camera_->GetDepthBuffer());
 
   // Update human model
   human_label_node_->SetLabel(dataset_->GetHumanLabel());

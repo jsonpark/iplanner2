@@ -227,6 +227,7 @@ private:
 
   bool redraw_ = true;
   bool animation_ = false;
+  bool dataset_changed_ = false;
   double animation_start_time_ = 0.;
   double animation_time_ = 0.;
 
@@ -255,12 +256,15 @@ private:
   std::shared_ptr<RobotNode> robot_node_;
 
   // Dataset
-  std::shared_ptr<Wnp> dataset_wnp_;
   std::shared_ptr<UtKinect> dataset_utkinect_;
+  std::shared_ptr<Wnp> dataset_wnp_;
   std::shared_ptr<DatasetOcclusion> dataset_occlusion_;
   std::shared_ptr<Dataset> dataset_;
-  KinectV2 kinect_;
-  FakeKinect fake_kinect_;
+
+  // Sensor
+  std::shared_ptr<RgbdCamera> rgbd_camera_;
+  std::shared_ptr<KinectV2> kinect_;
+  std::shared_ptr<FakeKinect> fake_kinect_;
 
   // Human
   std::shared_ptr<HumanModel> human_model_;
