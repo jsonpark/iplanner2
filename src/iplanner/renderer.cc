@@ -171,7 +171,8 @@ void Renderer::Render()
   unsigned int value = 80000;
   glClearBufferuiv(GL_COLOR, 0, &value);
   glClear(GL_DEPTH_BUFFER_BIT);
-  glViewport(0, 0, 512, 424);
+  //glViewport(0, 0, 512, 424);
+  glViewport(0, 0, 640, 480);
 
   program_depth_camera_->Use();
   program_depth_point_cloud_->BindUniformBuffer(0, depth_camera_uniform_);
