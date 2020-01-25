@@ -1,7 +1,8 @@
 {
   "dataset_directory": {
     "wnp": "..\\..\\dataset\\watch-n-patch",
-    "utkinect":  "..\\..\\dataset\\utkinect"
+    "utkinect": "..\\..\\dataset\\utkinect",
+    "occlusion":  "..\\..\\dataset\\occlusion"
   },
 
   "image_sample_save_directory": "..\\figs",

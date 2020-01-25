@@ -16,6 +16,26 @@ Framebuffer::~Framebuffer()
     glDeleteFramebuffers(1, &id_);
 }
 
+void Framebuffer::Resize(int width, int height)
+{
+  width_ = width;
+  height_ = height;
+
+  if (generated_)
+  {
+    glDeleteFramebuffers(1, &id_);
+
+    texture_colors_.clear();
+    texture_depth_ = nullptr;
+    texture_depth_stencil_ = nullptr;
+    depth_renderbuffer_ = nullptr;
+  }
+
+  Generate();
+
+  // TODO: 
+}
+
 void Framebuffer::Use()
 {
   Bind();

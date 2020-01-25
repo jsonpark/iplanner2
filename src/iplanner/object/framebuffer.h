@@ -22,6 +22,8 @@ public:
 
   ~Framebuffer();
 
+  void Resize(int width, int height);
+
   void Bind();
   void Unbind();
 

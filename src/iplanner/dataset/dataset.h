@@ -3,6 +3,9 @@
 
 #include <string>
 #include <vector>
+#include <memory>
+
+#include "iplanner/human/human_label.h"
 
 namespace iplanner
 {
@@ -26,6 +29,9 @@ public:
   virtual int NumFrames();
   virtual std::vector<unsigned char> GetRgbImage();
   virtual std::vector<unsigned short> GetDepthImage();
+
+  virtual std::shared_ptr<HumanModel> GetHumanModel() const;
+  virtual std::shared_ptr<HumanLabel> GetHumanLabel() const;
 
   virtual bool PreviousSequence();
   virtual bool NextSequence();

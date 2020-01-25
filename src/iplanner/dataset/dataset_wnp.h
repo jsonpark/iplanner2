@@ -41,12 +41,6 @@ public:
   explicit Wnp(const std::string& directory);
 
   ~Wnp();
-
-  auto GetHumanModel() const
-  {
-    return human_model_;
-  }
-
   int NumSequences() override;
   void SelectSequence(int idx) override;
   void SelectSequence(const std::string& name) override;
@@ -63,7 +57,8 @@ public:
   std::vector<unsigned char> GetRgbImage() override;
   std::vector<unsigned short> GetDepthImage() override;
 
-  std::shared_ptr<HumanLabel> GetHumanLabel() const;
+  std::shared_ptr<HumanModel> GetHumanModel() const override;
+  std::shared_ptr<HumanLabel> GetHumanLabel() const override;
 
   bool PreviousSequence() override;
   bool NextSequence() override;

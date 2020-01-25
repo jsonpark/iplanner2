@@ -14,7 +14,9 @@
 #include "iplanner/scene/human_label_node.h"
 #include "iplanner/dataset/dataset_wnp.h"
 #include "iplanner/dataset/dataset_utkinect.h"
+#include "iplanner/dataset/dataset_occlusion.h"
 #include "iplanner/sensor/kinect_v2.h"
+#include "iplanner/sensor/fake_kinect.h"
 
 struct GLFWwindow;
 
@@ -255,8 +257,10 @@ private:
   // Dataset
   std::shared_ptr<Wnp> dataset_wnp_;
   std::shared_ptr<UtKinect> dataset_utkinect_;
+  std::shared_ptr<DatasetOcclusion> dataset_occlusion_;
   std::shared_ptr<Dataset> dataset_;
   KinectV2 kinect_;
+  FakeKinect fake_kinect_;
 
   // Human
   std::shared_ptr<HumanModel> human_model_;

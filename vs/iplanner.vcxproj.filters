@@ -196,6 +196,9 @@
     <ClCompile Include="..\src\iplanner\dataset\dataset_occlusion.cc">
       <Filter>src\iplanner\dataset</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\iplanner\sensor\fake_kinect.cc">
+      <Filter>src\iplanner\sensor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\iplanner\utils\json.h">
@@ -326,6 +329,9 @@
     </ClInclude>
     <ClInclude Include="..\src\iplanner\dataset\dataset_occlusion.h">
       <Filter>src\iplanner\dataset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\sensor\fake_kinect.h">
+      <Filter>src\iplanner\sensor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

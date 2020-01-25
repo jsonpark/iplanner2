@@ -94,7 +94,7 @@ void DatasetOcclusion::SelectSequence(int idx)
 
   rgb_image_indices_.resize(10000);
   std::fill(rgb_image_indices_.begin(), rgb_image_indices_.end(), -1);
-  for (auto& it : fs::directory_iterator(directory_ + directory_character + sequence_names_[idx] + directory_character + "rgbjpg"))
+  for (auto& it : fs::directory_iterator(directory_ + directory_character + sequence_names_[idx] + directory_character + "rgb"))
   {
     const auto& path = it.path();
     const auto& filename = path.filename().string();
@@ -161,13 +161,32 @@ void DatasetOcclusion::LoadBody()
 
   double rgb_timestamp = 0.;
   double depth_timestamp = 0.;
-  for (int i=0; i<num_frames_; i++)
+  for (int i = 0; i < num_frames_; i++)
   {
     in >> rgb_timestamp >> depth_timestamp;
 
     for (int j = 0; j < num_joints_; j++)
       in >> joints_[i][j](0) >> joints_[i][j](1) >> joints_[i][j](2);
   }
+
+  // Transform from Qualysis space to Kinect space
+  Matrix4d transform;
+  transform(3, 3) = 1.;
+
+  transform(0, 0) = 0.8954580151977138;
+  transform(0, 1) = 0.5103237861353643;
+  transform(0, 2) = -0.0508805743920705;
+  transform(0, 3) = -4507.420151100658;//meter
+
+  transform(1, 0) = -0.02123062193180733;
+  transform(1, 1) = -0.04180508717005156;
+  transform(1, 2) = -1.052294108532836;
+  transform(1, 3) = 1019.225762091929;//meetr
+
+  transform(2, 0) = -0.5224123887620519;
+  transform(2, 1) = 0.8888625338840541;
+  transform(2, 2) = -0.08742371986806169;
+  transform(2, 3) = 3469.696756240115;//meter
 
   // Convert joint coords to world space
   human_labels_.resize(num_frames_);
@@ -180,8 +199,18 @@ void DatasetOcclusion::LoadBody()
     {
       const auto& joint = joints_[i][j];
 
-      // Convert milimeter to meter
-      human_label.Position(j) = joint / 1000.;
+      if (joint.squaredNorm() < 1e-4)
+        human_label.Position(j).setZero();
+      else
+      {
+        // Transform from Qualysis space to Kinect space
+        Vector4d joint_homo;
+        joint_homo << joint, 1.;
+        joint_homo = transform * joint_homo;
+
+        // Convert milimeter to meter
+        human_label.Position(j) = joint_homo.block(0, 0, 3, 1) / 1000.;
+      }
     }
   }
 
@@ -238,7 +267,7 @@ void DatasetOcclusion::SelectSequenceFrame(const std::string& name, const std::s
 
 int DatasetOcclusion::FrameRate()
 {
-  return 6;
+  return 15;
 }
 
 int DatasetOcclusion::RgbWidth()
@@ -248,7 +277,7 @@ int DatasetOcclusion::RgbWidth()
 
 int DatasetOcclusion::RgbHeight()
 {
-  return 320;
+  return 480;
 }
 
 int DatasetOcclusion::DepthWidth()
@@ -293,14 +322,19 @@ std::vector<unsigned short> DatasetOcclusion::GetDepthImage()
   cached_depth_image_.resize(DepthWidth() * DepthHeight());
 
   // Depth .png images are grayscale with bit depth 16
-  auto filename = directory_ + directory_character + sequence_names_[current_sequence_] + directory_character + "depth_raw" + directory_character + std::to_string(cached_depth_image_index_) + ".png";
+  auto filename = directory_ + directory_character + sequence_names_[current_sequence_] + directory_character + "depth" + directory_character + std::to_string(cached_depth_image_index_) + ".png";
   int width, height, components;
   stbi_set_flip_vertically_on_load(true);
-  unsigned char* data = stbi_load(filename.c_str(), &width, &height, &components, 0);
-  cached_depth_image_ = std::vector<unsigned short>(data, data + static_cast<std::uint64_t>(width) * height * components * sizeof(unsigned short));
+  unsigned short* data = stbi_load_16(filename.c_str(), &width, &height, &components, 0);
+  cached_depth_image_ = std::vector<unsigned short>(data, data + static_cast<std::uint64_t>(width) * height * components);
   stbi_image_free(data);
 
   return cached_depth_image_;
+}
+
+std::shared_ptr<HumanModel> DatasetOcclusion::GetHumanModel() const
+{
+  return human_model_;
 }
 
 std::shared_ptr<HumanLabel> DatasetOcclusion::GetHumanLabel() const

@@ -519,6 +519,11 @@ std::vector<unsigned short> Wnp::GetDepthImage()
   return cached_depth_image_;
 }
 
+std::shared_ptr<HumanModel> Wnp::GetHumanModel() const
+{
+  return human_model_;
+}
+
 std::shared_ptr<HumanLabel> Wnp::GetHumanLabel() const
 {
   return human_labels_[current_frame_];

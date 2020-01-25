@@ -262,6 +262,7 @@
     <ClCompile Include="..\src\iplanner\scene\robot_node.cc" />
     <ClCompile Include="..\src\iplanner\scene\scene.cc" />
     <ClCompile Include="..\src\iplanner\scene\scene_node.cc" />
+    <ClCompile Include="..\src\iplanner\sensor\fake_kinect.cc" />
     <ClCompile Include="..\src\iplanner\sensor\kinect_v2.cc" />
     <ClCompile Include="..\src\iplanner\shader\program.cc" />
     <ClCompile Include="..\src\iplanner\shader\shader.cc" />
@@ -305,6 +306,7 @@
     <ClInclude Include="..\src\iplanner\scene\robot_node.h" />
     <ClInclude Include="..\src\iplanner\scene\scene.h" />
     <ClInclude Include="..\src\iplanner\scene\scene_node.h" />
+    <ClInclude Include="..\src\iplanner\sensor\fake_kinect.h" />
     <ClInclude Include="..\src\iplanner\sensor\kinect_v2.h" />
     <ClInclude Include="..\src\iplanner\shader\program.h" />
     <ClInclude Include="..\src\iplanner\shader\shader.h" />

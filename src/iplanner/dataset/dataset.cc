@@ -83,4 +83,14 @@ bool Dataset::NextFrame()
 {
   return false;
 }
+
+std::shared_ptr<HumanModel> Dataset::GetHumanModel() const
+{
+  return nullptr;
+}
+
+std::shared_ptr<HumanLabel> Dataset::GetHumanLabel() const
+{
+  return nullptr;
+}
 }

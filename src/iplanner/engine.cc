@@ -246,6 +246,16 @@ void Engine::SaveImageSamples()
       renderer_->SaveImages(config_.GetImageSampleSaveDirectory(), filename);
       std::cout << "Finished saving images" << std::endl;
     }
+
+    else if (image_sample.dataset == "utkinect")
+    {
+      // TODO
+    }
+
+    else if (image_sample.dataset == "occlusion")
+    {
+      // TODO
+    }
   }
 
   image_samples_saved_ = true;
@@ -323,7 +333,8 @@ void Engine::Initialize()
   // https://smeenk.com/kinect-field-of-view-comparison/
   color_camera_ = std::make_shared<Camera>();
   //color_camera_->SetAspect(std::atan(84.1f / 180.f * pi) / std::atan(53.8f / 180.f * pi));
-  color_camera_->SetAspect(1920.f / 1080.f);
+  color_camera_->SetAspect(640.f / 480.f);
+  //color_camera_->SetAspect(1920.f / 1080.f);
   color_camera_->SetFovy(53.8f / 180.f * pi);
   color_camera_->SetFar(10.f);
 
@@ -499,16 +510,18 @@ void Engine::Initialize()
   // Dataset
   dataset_wnp_ = std::make_shared<Wnp>(config_.GetDatasetDirectory("wnp"));
   dataset_utkinect_ = std::make_shared<UtKinect>(config_.GetDatasetDirectory("utkinect"));
+  dataset_occlusion_ = std::make_shared<DatasetOcclusion>(config_.GetDatasetDirectory("occlusion"));
 
-  dataset_ = dataset_wnp_;
+  //dataset_ = dataset_wnp_;
+  dataset_ = dataset_occlusion_;
 
   point_cloud_ = std::make_shared<PointCloud>();
 
-  renderer_->CreateEmptyTexture("data_color", 1920, 1080, Texture::Usage::TEXTURE);
-  renderer_->CreateEmptyTexture("data_depth", 424, 512, Texture::Usage::U16_TEXTURE); // data has column-major depth texture
+  renderer_->CreateEmptyTexture("data_color", 640, 480, Texture::Usage::TEXTURE);
+  renderer_->CreateEmptyTexture("data_depth", 640, 480, Texture::Usage::U16_TEXTURE); // data has column-major depth texture
 
   // Human
-  human_model_ = dataset_wnp_->GetHumanModel();
+  human_model_ = dataset_->GetHumanModel();
 
   // Scene
   InitializeScene();
@@ -533,6 +546,9 @@ void Engine::InitializeScene()
 
   // Human label scene
   human_label_node_ = std::make_shared<HumanLabelNode>();
+
+  // Kinect V2 human model edges
+  /*
   human_label_node_->AddEdge(0, 1);
   human_label_node_->AddEdge(1, 20);
   human_label_node_->AddEdge(20, 2);
@@ -558,11 +574,32 @@ void Engine::InitializeScene()
   human_label_node_->AddEdge(17, 18);
   human_label_node_->AddEdge(18, 19);
 
-  // Additional supports near spine
+  // Kinect V2: additional supports near spine
   human_label_node_->AddEdge(1, 4);
   human_label_node_->AddEdge(1, 8);
   human_label_node_->AddEdge(1, 12);
   human_label_node_->AddEdge(1, 16);
+  */
+
+  // DatasetOcclusion human model edges
+  human_label_node_->AddEdge(8, 7);
+  human_label_node_->AddEdge(7, 0);
+  human_label_node_->AddEdge(7, 1);
+  human_label_node_->AddEdge(1, 2);
+  human_label_node_->AddEdge(2, 3);
+  human_label_node_->AddEdge(7, 4);
+  human_label_node_->AddEdge(4, 5);
+  human_label_node_->AddEdge(5, 6);
+  human_label_node_->AddEdge(8, 9);
+  human_label_node_->AddEdge(9, 10);
+  human_label_node_->AddEdge(10, 11);
+  human_label_node_->AddEdge(8, 12);
+  human_label_node_->AddEdge(12, 13);
+  human_label_node_->AddEdge(13, 14);
+
+  // DatasetOcclusion: additional supports near spine
+  human_label_node_->AddEdge(1, 9);
+  human_label_node_->AddEdge(4, 12);
 
   SceneNode::Connect(root, human_label_node_);
 }
@@ -581,17 +618,22 @@ void Engine::Update()
   }
 
   // Update point cloud
+  /*
   kinect_.FeedFrame(dataset_->GetRgbImage(), dataset_->GetDepthImage());
   kinect_.GeneratePointCloud();
   kinect_.GetPointCloud(point_cloud_);
+  */
+  fake_kinect_.FeedFrame(dataset_->GetRgbImage(), dataset_->GetDepthImage());
+  fake_kinect_.GeneratePointCloud();
+  fake_kinect_.GetPointCloud(point_cloud_);
   point_cloud_node_->UpdateBuffer();
 
   // Update color/depth images from Kinect sensor
-  renderer_->UpdateTexture("data_color", kinect_.GetColorBuffer());
-  renderer_->UpdateTexture("data_depth", kinect_.GetDepthBuffer());
+  renderer_->UpdateTexture("data_color", fake_kinect_.GetColorBuffer());
+  renderer_->UpdateTexture("data_depth", fake_kinect_.GetDepthBuffer());
 
   // Update human model
-  human_label_node_->SetLabel(dataset_wnp_->GetHumanLabel());
+  human_label_node_->SetLabel(dataset_->GetHumanLabel());
 
   // sin function motion
   double v = (std::sin(5. * animation_time_) + 1.) / 2. * 0.2;

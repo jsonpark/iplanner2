@@ -80,11 +80,11 @@ private:
   UniformBuffer lights_uniform_;
 
   // Color framebuffer
-  Framebuffer framebuffer_color_{ 1920, 1080 };
+  std::shared_ptr<Framebuffer> framebuffer_color_;
   std::shared_ptr<Texture> framebuffer_color_texture_;
 
   // Depth framebuffer
-  Framebuffer framebuffer_depth_{ 512, 424 };
+  std::shared_ptr<Framebuffer> framebuffer_depth_;
   std::shared_ptr<Texture> framebuffer_depth_texture_;
 
   Buffer<float> framebuffer_vertices_

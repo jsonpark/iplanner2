@@ -15,7 +15,7 @@ namespace iplanner
 {
 Renderer::Renderer(Engine* engine)
   : engine_(engine),
-  point_cloud_buffer_(512 * 424 * 6),
+  point_cloud_buffer_(640 * 480 * 6),
   human_label_buffer_(25 * 6),
   human_label_edge_elements_(100)
 {
@@ -64,16 +64,22 @@ void Renderer::Initialize()
 
 
   // Framebuffer textures
-  framebuffer_color_texture_ = std::make_shared<Texture>(1920, 1080, Texture::Usage::COLOR_FRAMEBUFFER);
+  //framebuffer_color_texture_ = std::make_shared<Texture>(1920, 1080, Texture::Usage::COLOR_FRAMEBUFFER);
+  framebuffer_color_texture_ = std::make_shared<Texture>(640, 480, Texture::Usage::COLOR_FRAMEBUFFER);
 
   // Store depth values as u32 integers
-  framebuffer_depth_texture_ = std::make_shared<Texture>(512, 424, Texture::Usage::U32_FRAMEBUFFER);
+  //framebuffer_depth_texture_ = std::make_shared<Texture>(512, 424, Texture::Usage::U32_FRAMEBUFFER);
+  framebuffer_depth_texture_ = std::make_shared<Texture>(640, 480, Texture::Usage::U32_FRAMEBUFFER);
 
-  framebuffer_color_.AttachColorTexture(0, framebuffer_color_texture_);
-  framebuffer_color_.CreateDepthStencilRenderbuffer();
+  //framebuffer_color_ = std::make_shared<Framebuffer>(1920, 1080);
+  framebuffer_color_ = std::make_shared<Framebuffer>(640, 480);
+  framebuffer_color_->AttachColorTexture(0, framebuffer_color_texture_);
+  framebuffer_color_->CreateDepthStencilRenderbuffer();
 
-  framebuffer_depth_.AttachColorTexture(0, framebuffer_depth_texture_);
-  framebuffer_depth_.CreateDepthStencilRenderbuffer();
+  //framebuffer_depth_ = std::make_shared<Framebuffer>(512, 424);
+  framebuffer_depth_ = std::make_shared<Framebuffer>(640, 480);
+  framebuffer_depth_->AttachColorTexture(0, framebuffer_depth_texture_);
+  framebuffer_depth_->CreateDepthStencilRenderbuffer();
 
   // Framebuffer screen draw
   framebuffer_vao_.BufferPointer(0, 2, framebuffer_vertices_, 4, 0);
@@ -140,10 +146,11 @@ void Renderer::Render()
   auto depth_camera = scene_->GetCamera("depth");
 
   // Rendering color camera image to texture
-  framebuffer_color_.Use();
+  framebuffer_color_->Use();
   glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glViewport(0, 0, 1920, 1080);
+  //glViewport(0, 0, 1920, 1080);
+  glViewport(0, 0, 640, 480);
 
   program_color_camera_->Use();
   program_color_camera_->BindUniformBuffer(0, color_camera_uniform_);
@@ -157,7 +164,7 @@ void Renderer::Render()
   DrawMeshesColor();
 
   // Rendering depth camera image to texture
-  framebuffer_depth_.Use();
+  framebuffer_depth_->Use();
   // The Kinect v2 can physically sense depth at 8 meters.
   // However, 4.5m is where you can reliably track body joints.
   // Anything beyond 4.5 meters your body tracking yields inconsistent results.
@@ -282,7 +289,7 @@ void Renderer::SaveImages(const std::string& directory, const std::string& filen
   glDisable(GL_DEPTH_TEST);
 
   // Color image from robot
-  framebuffer_color_.Use();
+  framebuffer_color_->Use();
   std::string filename_color_robot = directory + '\\' + filename_prefix + "-color_robot.jpg";
   buffer.resize(1920 * 1080 * 3);
   glReadPixels(0, 0, 1920, 1020, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());

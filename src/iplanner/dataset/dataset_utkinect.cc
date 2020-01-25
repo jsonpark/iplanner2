@@ -47,7 +47,7 @@ UtKinect::UtKinect(const std::string& directory)
   : directory_(directory)
 {
   // Get sequence names
-  for (auto& it : fs::directory_iterator(directory + "RGB" + directory_character))
+  for (auto& it : fs::directory_iterator(directory + directory_character + "RGB" + directory_character))
   {
     const auto& path = it.path();
     sequence_names_.push_back(path.filename().string());
@@ -56,7 +56,7 @@ UtKinect::UtKinect(const std::string& directory)
 
   // Verify sequence names from depth data
   std::vector<std::string> depth_sequence_names;
-  for (auto& it : fs::directory_iterator(directory + "depth" + directory_character))
+  for (auto& it : fs::directory_iterator(directory + directory_character + "depth" + directory_character))
   {
     const auto& path = it.path();
     depth_sequence_names.push_back(path.filename().string());
