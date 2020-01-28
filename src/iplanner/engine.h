@@ -17,6 +17,7 @@
 #include "iplanner/dataset/dataset_occlusion.h"
 #include "iplanner/sensor/kinect_v2.h"
 #include "iplanner/sensor/fake_kinect.h"
+#include "iplanner/plan/planner.h"
 
 struct GLFWwindow;
 
@@ -243,6 +244,9 @@ private:
 
   // Config
   Config config_;
+
+  // Planner
+  std::shared_ptr<Planner> planner_;
 
   // Robot
   std::shared_ptr<RobotModel> robot_model_;

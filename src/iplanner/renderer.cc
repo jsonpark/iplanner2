@@ -170,7 +170,7 @@ void Renderer::Render()
   program_color_camera_->Use();
   program_color_camera_->BindUniformBuffer(0, color_camera_uniform_);
   program_color_camera_->Uniform3f("eye_position", color_camera->GetEye());
-  program_color_point_cloud_->Uniform1f("point_size", 1.f);
+  program_color_point_cloud_->Uniform1f("point_size", 1.5f);
   program_color_point_cloud_->BindUniformBuffer(0, color_camera_uniform_);
   program_human_edge_->BindUniformBuffer(0, color_camera_uniform_);
 
@@ -229,25 +229,25 @@ void Renderer::Render()
   {
   case Engine::ViewMode::ALL:
     // Color camera image from robot camera
-    glViewport(0, 0, color_camera_resolution_(0) / 4, color_camera_resolution_(1) / 4);
+    glViewport(0, 0, color_camera_resolution_(0) / 2, color_camera_resolution_(1) / 2);
     program_color_screen_->Use();
     framebuffer_vao_.SetTexture(0, framebuffer_color_texture_);
     framebuffer_vao_.Draw();
 
     // Depth camera image from robot camera
-    glViewport(color_camera_resolution_(0) / 4 + 10, 0, depth_camera_resolution_(0) / 2, depth_camera_resolution_(1) / 2);
+    glViewport(color_camera_resolution_(0) / 2 + 10, 0, depth_camera_resolution_(0) / 2, depth_camera_resolution_(1) / 2);
     program_depth_screen_->Use();
     framebuffer_vao_.SetTexture(0, framebuffer_depth_texture_);
     framebuffer_vao_.Draw();
 
     // Color camera image from dataset
-    glViewport(0, color_camera_resolution_(1) / 4 + 10, color_camera_resolution_(0) / 4, color_camera_resolution_(1) / 4);
+    glViewport(0, color_camera_resolution_(1) / 2 + 10, color_camera_resolution_(0) / 2, color_camera_resolution_(1) / 2);
     program_color_screen_->Use();
     framebuffer_vao_.SetTexture(0, textures_.find("data_color")->second);
     framebuffer_vao_.Draw();
 
     // Depth camera image from dataset
-    glViewport(color_camera_resolution_(0) / 4 + 10, depth_camera_resolution_(1) / 2 + 10, depth_camera_resolution_(0) / 2, depth_camera_resolution_(1) / 2);
+    glViewport(color_camera_resolution_(0) / 2 + 10, depth_camera_resolution_(1) / 2 + 10, depth_camera_resolution_(0) / 2, depth_camera_resolution_(1) / 2);
     program_depth_screen_->Use();
     data_depth_vao_.SetTexture(0, textures_.find("data_depth")->second);
     data_depth_vao_.Draw();
@@ -306,38 +306,38 @@ void Renderer::SaveImages(const std::string& directory, const std::string& filen
   // Color image from robot
   framebuffer_color_->Use();
   std::string filename_color_robot = directory + '\\' + filename_prefix + "-color_robot.jpg";
-  buffer.resize(1920 * 1080 * 3);
-  glReadPixels(0, 0, 1920, 1020, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
-  stbi_write_jpg(filename_color_robot.c_str(), 1920, 1080, 3, buffer.data(), quality);
+  buffer.resize(color_camera_resolution_(0) * color_camera_resolution_(1) * 3);
+  glReadPixels(0, 0, color_camera_resolution_(0), color_camera_resolution_(1), GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
+  stbi_write_jpg(filename_color_robot.c_str(), color_camera_resolution_(0), color_camera_resolution_(1), 3, buffer.data(), quality);
 
   // Depth image from robot
   Framebuffer::UseScreen();
-  glViewport(0, 0, 512, 424);
+  glViewport(0, 0, depth_camera_resolution_(0), depth_camera_resolution_(1));
   program_depth_screen_->Use();
   framebuffer_vao_.SetTexture(0, framebuffer_depth_texture_);
   framebuffer_vao_.Draw();
 
   std::string filename_depth_robot = directory + '\\' + filename_prefix + "-depth_robot.jpg";
-  buffer.resize(512 * 424 * 3);
-  glReadPixels(0, 0, 512, 424, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
-  stbi_write_jpg(filename_depth_robot.c_str(), 512, 424, 3, buffer.data(), quality);
+  buffer.resize(depth_camera_resolution_(0) * depth_camera_resolution_ (1) * 3);
+  glReadPixels(0, 0, depth_camera_resolution_(0), depth_camera_resolution_(1), GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
+  stbi_write_jpg(filename_depth_robot.c_str(), depth_camera_resolution_(0), depth_camera_resolution_(1), 3, buffer.data(), quality);
 
   // Color image from data
   std::string filename_color_data = directory + '\\' + filename_prefix + "-color_data.jpg";
   buffer = textures_.find("data_color")->second->GetImage();
-  stbi_write_jpg(filename_color_data.c_str(), 1920, 1080, 3, buffer.data(), quality);
+  stbi_write_jpg(filename_color_data.c_str(), color_camera_resolution_(0), color_camera_resolution_(1), 3, buffer.data(), quality);
 
   // Depth image from data
   Framebuffer::UseScreen();
-  glViewport(0, 0, 512, 424);
+  glViewport(0, 0, depth_camera_resolution_(0), depth_camera_resolution_(1));
   program_depth_screen_->Use();
   data_depth_vao_.SetTexture(0, textures_.find("data_depth")->second);
   data_depth_vao_.Draw();
 
   std::string filename_depth_data = directory + '\\' + filename_prefix + "-depth_data.jpg";
-  buffer.resize(512 * 424 * 3);
-  glReadPixels(0, 0, 512, 424, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
-  stbi_write_jpg(filename_depth_data.c_str(), 512, 424, 3, buffer.data(), quality);
+  buffer.resize(depth_camera_resolution_(0) * depth_camera_resolution_(1) * 3);
+  glReadPixels(0, 0, depth_camera_resolution_(0), depth_camera_resolution_(1), GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
+  stbi_write_jpg(filename_depth_data.c_str(), depth_camera_resolution_(0), depth_camera_resolution_(1), 3, buffer.data(), quality);
 }
 
 void Renderer::UpdateCameraUniformFromScene()
@@ -361,8 +361,8 @@ void Renderer::UpdateCameraUniformFromScene()
   program_depth_screen_->Uniform2f("nearfar", Vector2f(depth_camera->GetNear(), depth_camera->GetFar()));
 
   // TODO: width and height to screen size
-  program_color_point_cloud_->Uniform4f("width_height_near_far", Vector4f(1280, 720, view_camera->GetNear(), view_camera->GetFar()));
-  program_depth_point_cloud_->Uniform4f("width_height_near_far", Vector4f(512, 424, view_camera->GetNear(), view_camera->GetFar()));
+  program_color_point_cloud_->Uniform4f("width_height_near_far", Vector4f(color_camera_resolution_(0), color_camera_resolution_(1), view_camera->GetNear(), view_camera->GetFar()));
+  program_depth_point_cloud_->Uniform4f("width_height_near_far", Vector4f(depth_camera_resolution_(0), depth_camera_resolution_(1), view_camera->GetNear(), view_camera->GetFar()));
 }
 
 void Renderer::UpdateLightUniformFromScene()

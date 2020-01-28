@@ -246,6 +246,8 @@
     <ClCompile Include="..\src\iplanner\object\renderbuffer.cc" />
     <ClCompile Include="..\src\iplanner\object\texture.cc" />
     <ClCompile Include="..\src\iplanner\object\uniform_buffer.cc" />
+    <ClCompile Include="..\src\iplanner\plan\planner.cc" />
+    <ClCompile Include="..\src\iplanner\plan\trajectory.cc" />
     <ClCompile Include="..\src\iplanner\renderer.cc" />
     <ClCompile Include="..\src\iplanner\main.cc" />
     <ClCompile Include="..\src\iplanner\object\vertex_array.cc" />
@@ -290,6 +292,8 @@
     <ClInclude Include="..\src\iplanner\object\renderbuffer.h" />
     <ClInclude Include="..\src\iplanner\object\texture.h" />
     <ClInclude Include="..\src\iplanner\object\uniform_buffer.h" />
+    <ClInclude Include="..\src\iplanner\plan\planner.h" />
+    <ClInclude Include="..\src\iplanner\plan\trajectory.h" />
     <ClInclude Include="..\src\iplanner\renderer.h" />
     <ClInclude Include="..\src\iplanner\object\vertex_array.h" />
     <ClInclude Include="..\src\iplanner\robot\robot_joint.h" />

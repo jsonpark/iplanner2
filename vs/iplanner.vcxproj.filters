@@ -80,6 +80,9 @@
     <Filter Include="resource\dataset_sample\occlusion">
       <UniqueIdentifier>{bf65f552-e39e-413b-bd4e-9c7324ab934f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\iplanner\plan">
+      <UniqueIdentifier>{ebaae7dc-e87f-46c0-b628-1095b03eec84}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\lib\glad\glad.c">
@@ -198,6 +201,12 @@
     </ClCompile>
     <ClCompile Include="..\src\iplanner\sensor\fake_kinect.cc">
       <Filter>src\iplanner\sensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\plan\planner.cc">
+      <Filter>src\iplanner\plan</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\plan\trajectory.cc">
+      <Filter>src\iplanner\plan</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -335,6 +344,12 @@
     </ClInclude>
     <ClInclude Include="..\src\iplanner\sensor\rgbd_camera.h">
       <Filter>src\iplanner\sensor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\plan\planner.h">
+      <Filter>src\iplanner\plan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\plan\trajectory.h">
+      <Filter>src\iplanner\plan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

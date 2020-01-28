@@ -16,6 +16,9 @@ using Vector2d = Eigen::Vector2d;
 using Vector3d = Eigen::Vector3d;
 using Vector4d = Eigen::Vector4d;
 
+using VectorXf = Eigen::VectorXf;
+using VectorXd = Eigen::VectorXd;
+
 using Quaternionf = Eigen::Quaternionf;
 using Quaterniond = Eigen::Quaterniond;
 
@@ -34,6 +37,9 @@ using Matrix4f = Eigen::Matrix4f;
 
 using Matrix3d = Eigen::Matrix3d;
 using Matrix4d = Eigen::Matrix4d;
+
+using MatrixXf = Eigen::MatrixXf;
+using MatrixXd = Eigen::MatrixXd;
 
 using Affine3f = Eigen::Affine3f;
 using Affine3d = Eigen::Affine3d;
