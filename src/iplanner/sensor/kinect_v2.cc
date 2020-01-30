@@ -65,7 +65,8 @@ void KinectV2::GeneratePointCloud()
   {
     for (int y = 1; y <= depth_height_; y++)
     {
-      int index = (y - 1) + (x - 1) * depth_height_;
+      //int index = (y - 1) + (x - 1) * depth_height_;
+      int index = (x - 1) + (depth_height_ - (y - 1) - 1) * depth_width_;
       coords[index * 3 + 0] = (x - depth_params_.cx) * depth_[index] / depth_params_.fx;
       coords[index * 3 + 1] = (y - depth_params_.cy) * depth_[index] / depth_params_.fy;
       coords[index * 3 + 2] = depth_[index];

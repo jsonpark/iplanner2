@@ -37,6 +37,7 @@ public:
   VectorXd AtTime(double t) const;
 
 private:
+  // Each column is joint angles
   MatrixXd trajectory_;
   double time_;
 };

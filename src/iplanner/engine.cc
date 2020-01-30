@@ -48,13 +48,13 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
   }
 
   auto engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
-  engine->MouseButton(engine_button, engine_action, mods);
+  engine->MouseButton(window, engine_button, engine_action, mods);
 }
 
 void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
   auto engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
-  engine->MouseMove(xpos, ypos);
+  engine->MouseMove(window, xpos, ypos);
 }
 
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -79,13 +79,13 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
   }
 
   auto engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
-  engine->Keyboard(engine_key, engine_action, mods);
+  engine->Keyboard(window, engine_key, engine_action, mods);
 }
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
   auto engine = static_cast<Engine*>(glfwGetWindowUserPointer(window));
-  engine->Resize(width, height);
+  engine->Resize(window, width, height);
 }
 }
 
@@ -98,131 +98,143 @@ Engine::~Engine()
 {
 }
 
-void Engine::MouseButton(Button button, MouseAction action, int mods)
+void Engine::MouseButton(GLFWwindow* window, Button button, MouseAction action, int mods)
 {
-  if (button == Button::LEFT)
-    mouse_button_status_[0] = action;
-
-  else if (button == Button::MIDDLE)
-    mouse_button_status_[1] = action;
-
-  else if (button == Button::RIGHT)
-    mouse_button_status_[2] = action;
-
-  glfwGetCursorPos(window_, &mouse_last_x_, &mouse_last_y_);
-
-  redraw_ = true;
-}
-
-void Engine::MouseMove(double x, double y)
-{
-  auto dx = static_cast<float>(x - mouse_last_x_);
-  auto dy = static_cast<float>(y - mouse_last_y_);
-
-  if (mouse_button_status_[1] != MouseAction::PRESS)
+  // Renderer
+  if (window == window_renderer_)
   {
-    // Zoom
-    if (mouse_button_status_[0] == MouseAction::PRESS &&
-      mouse_button_status_[2] == MouseAction::PRESS)
-    {
-      view_camera_->Zoom(dy);
-    }
+    if (button == Button::LEFT)
+      mouse_button_status_[0] = action;
 
-    else if (mouse_button_status_[0] == MouseAction::PRESS)
-    {
-      view_camera_->Rotate(dx, dy);
-    }
+    else if (button == Button::MIDDLE)
+      mouse_button_status_[1] = action;
 
-    else if (mouse_button_status_[2] == MouseAction::PRESS)
-    {
-      view_camera_->Translate(dx, dy);
-    }
+    else if (button == Button::RIGHT)
+      mouse_button_status_[2] = action;
+
+    glfwGetCursorPos(window, &mouse_last_x_, &mouse_last_y_);
+
+    redraw_ = true;
   }
-
-  mouse_last_x_ = x;
-  mouse_last_y_ = y;
-
-  redraw_ = true;
 }
 
-void Engine::Keyboard(Key key, KeyAction action, int mods)
+void Engine::MouseMove(GLFWwindow* window, double x, double y)
 {
-  if (action == KeyAction::PRESS)
+  // Renderer
+  if (window == window_renderer_)
   {
-    switch (key)
+    auto dx = static_cast<float>(x - mouse_last_x_);
+    auto dy = static_cast<float>(y - mouse_last_y_);
+
+    if (mouse_button_status_[1] != MouseAction::PRESS)
     {
-      // Play/pause video
-    case Key::SPACE:
-      if (!animation_)
+      // Zoom
+      if (mouse_button_status_[0] == MouseAction::PRESS &&
+        mouse_button_status_[2] == MouseAction::PRESS)
       {
-        animation_ = true;
-        animation_start_time_ = glfwGetTime() - animation_time_;
+        view_camera_->Zoom(dy);
       }
-      else
-        animation_ = false;
-      break;
 
-      // Number 1-6 selects view mode
-    case Key::NUM1:
-      view_mode_ = ViewMode::ALL;
-      break;
+      else if (mouse_button_status_[0] == MouseAction::PRESS)
+      {
+        view_camera_->Rotate(dx, dy);
+      }
 
-    case Key::NUM2:
-      view_mode_ = ViewMode::VIEW;
-      break;
+      else if (mouse_button_status_[2] == MouseAction::PRESS)
+      {
+        view_camera_->Translate(dx, dy);
+      }
+    }
 
-    case Key::NUM3:
-      view_mode_ = ViewMode::COLOR_IMAGE;
-      break;
+    mouse_last_x_ = x;
+    mouse_last_y_ = y;
 
-    case Key::NUM4:
-      view_mode_ = ViewMode::COLOR_VIEW;
-      break;
+    redraw_ = true;
+  }
+}
 
-    case Key::NUM5:
-      view_mode_ = ViewMode::DEPTH_IMAGE;
-      break;
+void Engine::Keyboard(GLFWwindow* window, Key key, KeyAction action, int mods)
+{
+  // Renderer
+  if (window == window_renderer_)
+  {
+    if (action == KeyAction::PRESS)
+    {
+      switch (key)
+      {
+        // Play/pause video
+      case Key::SPACE:
+        if (!animation_)
+        {
+          animation_ = true;
+          animation_start_time_ = glfwGetTime() - animation_time_;
+        }
+        else
+          animation_ = false;
+        break;
 
-    case Key::NUM6:
-      view_mode_ = ViewMode::DEPTH_VIEW;
-      break;
+        // Number 1-6 selects view mode
+      case Key::NUM1:
+        view_mode_ = ViewMode::ALL;
+        break;
 
-      // Keyboard up/down changes sequence
-    case Key::UP:
-      animation_time_ = 0.;
-      animation_start_time_ = glfwGetTime();
-      dataset_->PreviousSequence();
-      break;
+      case Key::NUM2:
+        view_mode_ = ViewMode::VIEW;
+        break;
 
-    case Key::DOWN:
-      animation_time_ = 0.;
-      animation_start_time_ = glfwGetTime();
-      dataset_->NextSequence();
-      break;
+      case Key::NUM3:
+        view_mode_ = ViewMode::COLOR_IMAGE;
+        break;
 
-      // Replay
-    case Key::R:
-      animation_time_ = 0.;
-      animation_start_time_ = glfwGetTime();
-      break;
+      case Key::NUM4:
+        view_mode_ = ViewMode::COLOR_VIEW;
+        break;
 
-      // Save sample images
-    case Key::S:
-      SaveImageSamples();
-      break;
+      case Key::NUM5:
+        view_mode_ = ViewMode::DEPTH_IMAGE;
+        break;
 
-      // Numpad (KP_x) sets a dataset
-    case Key::KP_1:
-      ChooseUtKinect();
-      break;
+      case Key::NUM6:
+        view_mode_ = ViewMode::DEPTH_VIEW;
+        break;
 
-    case Key::KP_2:
-      ChooseWnp();
-      break;
+        // Keyboard up/down changes sequence
+      case Key::UP:
+        animation_time_ = 0.;
+        animation_start_time_ = glfwGetTime();
+        dataset_->PreviousSequence();
+        break;
 
-    case Key::KP_3:
-      ChooseOcclusion();
-      break;
+      case Key::DOWN:
+        animation_time_ = 0.;
+        animation_start_time_ = glfwGetTime();
+        dataset_->NextSequence();
+        break;
+
+        // Replay
+      case Key::R:
+        animation_time_ = 0.;
+        animation_start_time_ = glfwGetTime();
+        break;
+
+        // Save sample images
+      case Key::S:
+        SaveImageSamples();
+        break;
+
+        // Numpad (KP_x) sets a dataset
+      case Key::KP_1:
+        ChooseUtKinect();
+        break;
+
+      case Key::KP_2:
+        ChooseWnp();
+        break;
+
+      case Key::KP_3:
+        ChooseOcclusion();
+        break;
+      }
     }
   }
 }
@@ -233,6 +245,11 @@ void Engine::ChooseUtKinect()
   {
     dataset_ = dataset_utkinect_;
     rgbd_camera_ = kinect_v1_;
+
+    human_label_node_kinect_v1_->Show();
+    human_label_node_kinect_v2_->Hide();
+    human_label_node_fake_kinect_->Hide();
+    human_label_node_ = human_label_node_kinect_v1_;
 
     animation_time_ = 0.;
     animation_start_time_ = glfwGetTime();
@@ -249,6 +266,11 @@ void Engine::ChooseWnp()
     dataset_ = dataset_wnp_;
     rgbd_camera_ = kinect_v2_;
 
+    human_label_node_kinect_v1_->Hide();
+    human_label_node_kinect_v2_->Show();
+    human_label_node_fake_kinect_->Hide();
+    human_label_node_ = human_label_node_kinect_v2_;
+
     animation_time_ = 0.;
     animation_start_time_ = glfwGetTime();
     animation_ = false;
@@ -264,6 +286,11 @@ void Engine::ChooseOcclusion()
     dataset_ = dataset_occlusion_;
     rgbd_camera_ = fake_kinect_;
 
+    human_label_node_kinect_v1_->Hide();
+    human_label_node_kinect_v2_->Hide();
+    human_label_node_fake_kinect_->Show();
+    human_label_node_ = human_label_node_fake_kinect_;
+
     animation_time_ = 0.;
     animation_start_time_ = glfwGetTime();
     animation_ = false;
@@ -272,12 +299,22 @@ void Engine::ChooseOcclusion()
   }
 }
 
-void Engine::Resize(int width, int height)
+void Engine::Resize(GLFWwindow* window, int width, int height)
 {
-  width_ = width;
-  height_ = height;
+  if (window == window_renderer_)
+  {
+    width_ = width;
+    height_ = height;
 
-  redraw_ = true;
+    redraw_ = true;
+  }
+
+  else if (window == window_controller_)
+  {
+    controller_->Resize(width, height);
+
+    redraw_controller_ = true;
+  }
 }
 
 void Engine::SaveImageSamples()
@@ -356,30 +393,58 @@ void Engine::Run()
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  window_ = glfwCreateWindow(width_, height_, "IplannerEngine", NULL, NULL);
-  if (window_ == NULL)
+
+  // Renderer window
+  window_renderer_ = glfwCreateWindow(width_, height_, "Iplanner", NULL, NULL);
+  if (window_renderer_ == NULL)
   {
     glfwTerminate();
     throw std::runtime_error("Engine: Failed to create GLFW window.");
   }
+  glfwSetWindowPos(window_renderer_, 10, 100);
 
-  glfwMakeContextCurrent(window_);
+  glfwMakeContextCurrent(window_renderer_);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     throw std::runtime_error("Engine: Failed to initialize GLAD.");
 
 
   // Callbacks
-  glfwSetWindowUserPointer(window_, this);
-  glfwSetMouseButtonCallback(window_, MouseButtonCallback);
-  glfwSetCursorPosCallback(window_, CursorPosCallback);
-  glfwSetKeyCallback(window_, KeyCallback);
-  glfwSetFramebufferSizeCallback(window_, FramebufferSizeCallback);
+  glfwSetWindowUserPointer(window_renderer_, this);
+  glfwSetMouseButtonCallback(window_renderer_, MouseButtonCallback);
+  glfwSetCursorPosCallback(window_renderer_, CursorPosCallback);
+  glfwSetKeyCallback(window_renderer_, KeyCallback);
+  glfwSetFramebufferSizeCallback(window_renderer_, FramebufferSizeCallback);
 
-  // Renderer
+
+  // Controller window
+  window_controller_ = glfwCreateWindow(800, 800, "Iplanner Controller", NULL, NULL);
+  if (window_controller_ == NULL)
+  {
+    glfwTerminate();
+    throw std::runtime_error("Engine: Failed to create GLFW window.");
+  }
+  glfwSetWindowPos(window_controller_, 1000, 100);
+
+  glfwMakeContextCurrent(window_controller_);
+
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    throw std::runtime_error("Engine: Failed to initialize GLAD.");
+
+
+  // Callbacks
+  glfwSetWindowUserPointer(window_controller_, this);
+  glfwSetMouseButtonCallback(window_controller_, MouseButtonCallback);
+  glfwSetCursorPosCallback(window_controller_, CursorPosCallback);
+  glfwSetKeyCallback(window_controller_, KeyCallback);
+  glfwSetFramebufferSizeCallback(window_controller_, FramebufferSizeCallback);
+
+
+
+  // Render
   Initialize();
 
-  while (!glfwWindowShouldClose(window_))
+  while (!glfwWindowShouldClose(window_renderer_) && !glfwWindowShouldClose(window_controller_))
   {
     using namespace std::chrono_literals;
 
@@ -387,26 +452,49 @@ void Engine::Run()
 
     glfwPollEvents();
 
+
+    // Draw renderer
     Update();
 
     if (redraw_)
     {
+      glfwMakeContextCurrent(window_renderer_);
       renderer_->Render();
 
-      glfwSwapBuffers(window_);
+      glfwSwapBuffers(window_renderer_);
 
       redraw_ = false;
     }
+
+
+    // Draw controller
+    UpdateController();
+
+    if (redraw_controller_)
+    {
+      glfwMakeContextCurrent(window_controller_);
+      controller_->Render();
+
+      glfwSwapBuffers(window_controller_);
+
+      redraw_controller_ = false;
+    }
+
 
     // Let CPU be idle for a short time window
     std::this_thread::sleep_until(timestamp + (1s / 120));
   }
 
   glfwTerminate();
+
+  planner_->Stop();
 }
 
 void Engine::Initialize()
 {
+  // Renderer
+  glfwMakeContextCurrent(window_renderer_);
+
   glfwWindowHint(GLFW_SAMPLES, 4);
   glEnable(GL_MULTISAMPLE);
 
@@ -414,6 +502,18 @@ void Engine::Initialize()
   renderer_->SetColorCameraResolution(640, 480);
   renderer_->SetDepthCameraResolution(640, 480);
   renderer_->Initialize();
+
+
+  // Controller
+  glfwMakeContextCurrent(window_controller_);
+
+  // TODO: hard coded window size
+  controller_ = std::make_unique<Controller>(this, 800, 800);
+  controller_->Initialize();
+
+
+  // Renderer
+  glfwMakeContextCurrent(window_renderer_);
 
   constexpr double pi = 3.1415926535897932384626433832795;
   view_camera_ = std::make_shared<Camera>();
@@ -471,7 +571,8 @@ void Engine::Initialize()
   robot_model_ = robot_model_loader.Load("fetch_description\\robots\\fetch.urdf");
 
 
-  /* Full robot model
+  // Full robot model
+  /*
   Robot [fetch] links:
    0: base_link
    1: r_wheel_link
@@ -528,7 +629,8 @@ void Engine::Initialize()
   24: head_camera_depth_optical_joint
   */
 
-  /* Robot planning model:
+  // Robot planning model:
+  /*
   Robot [] links:
    0: base_link
    1: torso_lift_link
@@ -629,6 +731,8 @@ void Engine::Initialize()
   planner_->Config().time = 5.;
 
   planner_->RunAsync();
+
+  ChooseOcclusion();
 }
 
 void Engine::InitializeScene()
@@ -649,67 +753,99 @@ void Engine::InitializeScene()
 
 
   // Human label scene
-  human_label_node_ = std::make_shared<HumanLabelNode>();
+  human_label_node_kinect_v1_ = std::make_shared<HumanLabelNode>();
+  human_label_node_kinect_v2_ = std::make_shared<HumanLabelNode>();
+  human_label_node_fake_kinect_ = std::make_shared<HumanLabelNode>();
 
-  // Kinect V2 human model edges
-  /*
-  human_label_node_->AddEdge(0, 1);
-  human_label_node_->AddEdge(1, 20);
-  human_label_node_->AddEdge(20, 2);
-  human_label_node_->AddEdge(2, 3);
-  human_label_node_->AddEdge(20, 4);
-  human_label_node_->AddEdge(4, 5);
-  human_label_node_->AddEdge(5, 6);
-  human_label_node_->AddEdge(6, 7);
-  human_label_node_->AddEdge(7, 21);
-  human_label_node_->AddEdge(6, 22);
-  human_label_node_->AddEdge(20, 8);
-  human_label_node_->AddEdge(8, 9);
-  human_label_node_->AddEdge(9, 10);
-  human_label_node_->AddEdge(10, 11);
-  human_label_node_->AddEdge(11, 23);
-  human_label_node_->AddEdge(10, 24);
-  human_label_node_->AddEdge(0, 12);
-  human_label_node_->AddEdge(12, 13);
-  human_label_node_->AddEdge(13, 14);
-  human_label_node_->AddEdge(14, 15);
-  human_label_node_->AddEdge(0, 16);
-  human_label_node_->AddEdge(16, 17);
-  human_label_node_->AddEdge(17, 18);
-  human_label_node_->AddEdge(18, 19);
+  // Kinect V1 human model edges
+  human_label_node_kinect_v1_->AddEdge(0, 1);
+  human_label_node_kinect_v1_->AddEdge(1, 2);
+  human_label_node_kinect_v1_->AddEdge(2, 3);
+  human_label_node_kinect_v1_->AddEdge(2, 3);
+  human_label_node_kinect_v1_->AddEdge(2, 4);
+  human_label_node_kinect_v1_->AddEdge(4, 5);
+  human_label_node_kinect_v1_->AddEdge(5, 6);
+  human_label_node_kinect_v1_->AddEdge(6, 7);
+  human_label_node_kinect_v1_->AddEdge(2, 8);
+  human_label_node_kinect_v1_->AddEdge(8, 9);
+  human_label_node_kinect_v1_->AddEdge(9, 10);
+  human_label_node_kinect_v1_->AddEdge(10, 11);
+  human_label_node_kinect_v1_->AddEdge(0, 12);
+  human_label_node_kinect_v1_->AddEdge(12, 13);
+  human_label_node_kinect_v1_->AddEdge(13, 14);
+  human_label_node_kinect_v1_->AddEdge(14, 15);
+  human_label_node_kinect_v1_->AddEdge(0, 16);
+  human_label_node_kinect_v1_->AddEdge(16, 17);
+  human_label_node_kinect_v1_->AddEdge(17, 18);
+  human_label_node_kinect_v1_->AddEdge(18, 19);
 
   // Kinect V2: additional supports near spine
-  human_label_node_->AddEdge(1, 4);
-  human_label_node_->AddEdge(1, 8);
-  human_label_node_->AddEdge(1, 12);
-  human_label_node_->AddEdge(1, 16);
-  */
+  human_label_node_kinect_v1_->AddEdge(4, 12);
+  human_label_node_kinect_v1_->AddEdge(8, 16);
+
+  // Kinect V2 human model edges
+  human_label_node_kinect_v2_->AddEdge(0, 1);
+  human_label_node_kinect_v2_->AddEdge(1, 20);
+  human_label_node_kinect_v2_->AddEdge(20, 2);
+  human_label_node_kinect_v2_->AddEdge(2, 3);
+  human_label_node_kinect_v2_->AddEdge(20, 4);
+  human_label_node_kinect_v2_->AddEdge(4, 5);
+  human_label_node_kinect_v2_->AddEdge(5, 6);
+  human_label_node_kinect_v2_->AddEdge(6, 7);
+  human_label_node_kinect_v2_->AddEdge(7, 21);
+  human_label_node_kinect_v2_->AddEdge(6, 22);
+  human_label_node_kinect_v2_->AddEdge(20, 8);
+  human_label_node_kinect_v2_->AddEdge(8, 9);
+  human_label_node_kinect_v2_->AddEdge(9, 10);
+  human_label_node_kinect_v2_->AddEdge(10, 11);
+  human_label_node_kinect_v2_->AddEdge(11, 23);
+  human_label_node_kinect_v2_->AddEdge(10, 24);
+  human_label_node_kinect_v2_->AddEdge(0, 12);
+  human_label_node_kinect_v2_->AddEdge(12, 13);
+  human_label_node_kinect_v2_->AddEdge(13, 14);
+  human_label_node_kinect_v2_->AddEdge(14, 15);
+  human_label_node_kinect_v2_->AddEdge(0, 16);
+  human_label_node_kinect_v2_->AddEdge(16, 17);
+  human_label_node_kinect_v2_->AddEdge(17, 18);
+  human_label_node_kinect_v2_->AddEdge(18, 19);
+
+  // Kinect V2: additional supports near spine
+  human_label_node_kinect_v2_->AddEdge(1, 4);
+  human_label_node_kinect_v2_->AddEdge(1, 8);
+  human_label_node_kinect_v2_->AddEdge(1, 12);
+  human_label_node_kinect_v2_->AddEdge(1, 16);
 
   // DatasetOcclusion human model edges
-  human_label_node_->AddEdge(8, 7);
-  human_label_node_->AddEdge(7, 0);
-  human_label_node_->AddEdge(7, 1);
-  human_label_node_->AddEdge(1, 2);
-  human_label_node_->AddEdge(2, 3);
-  human_label_node_->AddEdge(7, 4);
-  human_label_node_->AddEdge(4, 5);
-  human_label_node_->AddEdge(5, 6);
-  human_label_node_->AddEdge(8, 9);
-  human_label_node_->AddEdge(9, 10);
-  human_label_node_->AddEdge(10, 11);
-  human_label_node_->AddEdge(8, 12);
-  human_label_node_->AddEdge(12, 13);
-  human_label_node_->AddEdge(13, 14);
+  human_label_node_fake_kinect_->AddEdge(8, 7);
+  human_label_node_fake_kinect_->AddEdge(7, 0);
+  human_label_node_fake_kinect_->AddEdge(7, 1);
+  human_label_node_fake_kinect_->AddEdge(1, 2);
+  human_label_node_fake_kinect_->AddEdge(2, 3);
+  human_label_node_fake_kinect_->AddEdge(7, 4);
+  human_label_node_fake_kinect_->AddEdge(4, 5);
+  human_label_node_fake_kinect_->AddEdge(5, 6);
+  human_label_node_fake_kinect_->AddEdge(8, 9);
+  human_label_node_fake_kinect_->AddEdge(9, 10);
+  human_label_node_fake_kinect_->AddEdge(10, 11);
+  human_label_node_fake_kinect_->AddEdge(8, 12);
+  human_label_node_fake_kinect_->AddEdge(12, 13);
+  human_label_node_fake_kinect_->AddEdge(13, 14);
 
   // DatasetOcclusion: additional supports near spine
-  human_label_node_->AddEdge(1, 9);
-  human_label_node_->AddEdge(4, 12);
+  human_label_node_fake_kinect_->AddEdge(1, 9);
+  human_label_node_fake_kinect_->AddEdge(4, 12);
 
-  SceneNode::Connect(root, human_label_node_);
+  SceneNode::Connect(root, human_label_node_kinect_v1_);
+  SceneNode::Connect(root, human_label_node_kinect_v2_);
+  SceneNode::Connect(root, human_label_node_fake_kinect_);
+
+  human_label_node_ = human_label_node_fake_kinect_;
 }
 
 void Engine::Update()
 {
+  glfwMakeContextCurrent(window_renderer_);
+
   auto& state = *robot_state_;
 
   double t = glfwGetTime() - animation_start_time_;
@@ -752,8 +888,28 @@ void Engine::Update()
   human_label_node_->SetLabel(dataset_->GetHumanLabel());
 
   // sin function motion
+  /*
   double v = (std::sin(5. * animation_time_) + 1.) / 2. * 0.2;
   state.JointPosition(4) = -0.3 + v;
+  */
+
+  // Robot trajectory from planner
+  /*
+  auto trajectory_point = planner_->GetTrajectory().AtTime(animation_time_);
+  for (int i = 0; i < state.NumJoints(); i++)
+    state.JointPosition(i) = trajectory_point(i);
+    */
+
+  // Robot trajectory from dataset
+  auto trajectory = dataset_->GetTrajectory();
+  //std::cout << "trajectory dimension: " << trajectory.Rows() << " x " << trajectory.Cols() << std::endl;
+  auto trajectory_point = trajectory.AtTime(animation_time_);
+
+  for (int i = 0; i < state.NumJoints() && i < trajectory.Rows(); i++)
+    state.JointPosition(i) = trajectory_point(i);
+
+  for (int i = trajectory.Rows(); i < state.NumJoints(); i++)
+    state.JointPosition(i) = 0.;
 
   state.ForwardKinematics();
 
@@ -783,6 +939,18 @@ void Engine::UpdateScene()
     robot_node_->SetJointValue(state.JointName(i), state.JointPosition(i));
 
   redraw_ = true;
+}
+
+void Engine::UpdateController()
+{
+  glfwMakeContextCurrent(window_controller_);
+
+  auto trajectory = dataset_->GetTrajectory();
+  controller_->SetControllerSize(trajectory.Rows(), trajectory.Cols());
+
+  // TODO
+
+  redraw_controller_ = true;
 }
 
 Vector2i Engine::GetScreenSize() const

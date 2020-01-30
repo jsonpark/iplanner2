@@ -7,6 +7,8 @@ namespace iplanner
 {
 // Vector types
 using Vector2i = Eigen::Vector2i;
+using Vector3i = Eigen::Vector3i;
+using Vector4i = Eigen::Vector4i;
 
 using Vector2f = Eigen::Vector2f;
 using Vector3f = Eigen::Vector3f;

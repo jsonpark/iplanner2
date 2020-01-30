@@ -14,8 +14,6 @@
 #include "iplanner/scene/human_label_node.h"
 #include "iplanner/scene/point_cloud_node.h"
 
-struct GLFWwindow;
-
 namespace iplanner
 {
 class Engine;
@@ -110,10 +108,10 @@ private:
   // Depth data vao
   Buffer<float> data_depth_vertices_
   {
-    -1.f, -1.f, 1.f, 0.f,
-    1.f, -1.f, 1.f, 1.f,
-    -1.f, 1.f, 0.f, 0.f,
-    1.f, 1.f, 0.f, 1.f
+    -1.f, -1.f, 0.f, 0.f,
+    1.f, -1.f, 1.f, 0.f,
+    -1.f, 1.f, 0.f, 1.f,
+    1.f, 1.f, 1.f, 1.f
   };
 
   ElementBuffer data_depth_elements_{ 0, 1, 2, 3 };

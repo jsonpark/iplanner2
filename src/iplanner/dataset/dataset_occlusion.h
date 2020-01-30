@@ -17,7 +17,6 @@ class DatasetOcclusion : public Dataset
 private:
   constexpr static int num_joints_ = 15;
 
-public:
   using Joints = std::array<Vector3d, num_joints_>;
 
 public:
@@ -33,13 +32,13 @@ public:
   void SelectSequenceFrame(const std::string& name, const std::string& index);
   void SelectFrame(int frame) override;
 
-  int FrameRate() override;
+  int FrameRate() const override;
   int RgbWidth() override;
   int RgbHeight() override;
   int DepthWidth() override;
   int DepthHeight() override;
 
-  int NumFrames() override;
+  int NumFrames() const override;
   std::vector<unsigned char> GetRgbImage() override;
   std::vector<unsigned short> GetDepthImage() override;
 
@@ -50,6 +49,9 @@ public:
   bool NextSequence() override;
   bool PreviousFrame() override;
   bool NextFrame() override;
+
+  Trajectory GetTrajectory() override;
+  void SaveTrajectory(Trajectory trajectory) override;
 
 private:
   void LoadBody();

@@ -4,6 +4,7 @@
 #include <array>
 
 #include "iplanner/renderer.h"
+#include "iplanner/controller.h"
 #include "iplanner/config/config.h"
 #include "iplanner/robot/robot_model.h"
 #include "iplanner/robot/robot_state.h"
@@ -191,10 +192,10 @@ public:
 
   void Run();
 
-  void MouseButton(Button button, MouseAction action, int mods);
-  void MouseMove(double x, double y);
-  void Keyboard(Key key, KeyAction action, int mods);
-  void Resize(int width, int height);
+  void MouseButton(GLFWwindow* window, Button button, MouseAction action, int mods);
+  void MouseMove(GLFWwindow* window, double x, double y);
+  void Keyboard(GLFWwindow* window, Key key, KeyAction action, int mods);
+  void Resize(GLFWwindow* window, int width, int height);
 
   Vector2i GetScreenSize() const;
 
@@ -216,10 +217,13 @@ private:
   void Update();
   void UpdateScene();
 
+  void UpdateController();
+
   int width_ = 1280;
   int height_ = 720;
 
-  GLFWwindow* window_ = 0;
+  GLFWwindow* window_renderer_ = 0;
+  GLFWwindow* window_controller_ = 0;
 
   std::array<MouseAction, 3> mouse_button_status_
   {
@@ -231,6 +235,7 @@ private:
   double mouse_last_x_ = 0.;
   double mouse_last_y_ = 0.;
 
+  // Renderer
   bool redraw_ = true;
   bool animation_ = false;
   bool dataset_changed_ = false;
@@ -246,6 +251,11 @@ private:
   std::shared_ptr<Scene> scene_;
 
   ViewMode view_mode_ = ViewMode::ALL;
+
+  // Controller
+  bool redraw_controller_ = true;
+
+  std::unique_ptr<Controller> controller_;
 
   // Config
   Config config_;
@@ -280,6 +290,9 @@ private:
   std::shared_ptr<HumanModel> human_model_;
 
   // Human scene node
+  std::shared_ptr<HumanLabelNode> human_label_node_kinect_v2_;
+  std::shared_ptr<HumanLabelNode> human_label_node_kinect_v1_;
+  std::shared_ptr<HumanLabelNode> human_label_node_fake_kinect_;
   std::shared_ptr<HumanLabelNode> human_label_node_;
 
   // Pre-allocated point cloud memory

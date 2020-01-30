@@ -83,6 +83,9 @@
     <Filter Include="src\iplanner\plan">
       <UniqueIdentifier>{ebaae7dc-e87f-46c0-b628-1095b03eec84}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resource\dataset_sample\utkinect">
+      <UniqueIdentifier>{a8e09941-549d-49d9-86dc-40cfc658faa8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\lib\glad\glad.c">
@@ -210,6 +213,9 @@
     </ClCompile>
     <ClCompile Include="..\src\iplanner\sensor\kinect_v1.cc">
       <Filter>src\iplanner\sensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\iplanner\controller.cc">
+      <Filter>src\iplanner</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -357,6 +363,9 @@
     <ClInclude Include="..\src\iplanner\sensor\kinect_v1.h">
       <Filter>src\iplanner\sensor</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\iplanner\controller.h">
+      <Filter>src\iplanner</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\shader\tutorial.vert">
@@ -449,6 +458,12 @@
     <None Include="..\..\dataset\occlusion\abdallah2BodyWalk1\qualisys.tsv">
       <Filter>resource\dataset_sample\occlusion</Filter>
     </None>
+    <None Include="..\src\shader\planar.frag">
+      <Filter>shader</Filter>
+    </None>
+    <None Include="..\src\shader\planar.vert">
+      <Filter>shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\dataset\occlusion\abdallah2BodyWalk1\groundTruth.txt">
@@ -457,5 +472,13 @@
     <Text Include="..\..\dataset\occlusion\abdallah2BodyWalk1\rgb_depth_pos.txt">
       <Filter>resource\dataset_sample\occlusion</Filter>
     </Text>
+    <Text Include="..\..\dataset\utkinect\joints\joints_s01_e01.txt">
+      <Filter>resource\dataset_sample\utkinect</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\..\dataset\utkinect\depth\s01_e01\depthImg190.xml">
+      <Filter>resource\dataset_sample\utkinect</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

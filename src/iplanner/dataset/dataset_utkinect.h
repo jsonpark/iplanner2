@@ -3,10 +3,21 @@
 
 #include "iplanner/dataset/dataset.h"
 
+#include <array>
+
+#include "iplanner/types.h"
+#include "iplanner/human/human_model.h"
+#include "iplanner/human/human_label.h"
+
 namespace iplanner
 {
 class UtKinect : public Dataset
 {
+private:
+  constexpr static int num_joints_ = 20;
+
+  using Joints = std::array<Vector3d, num_joints_>;
+
 public:
   UtKinect() = delete;
 
@@ -20,22 +31,30 @@ public:
   void SelectSequenceFrame(const std::string& name, const std::string& index);
   void SelectFrame(int frame) override;
 
-  int FrameRate() override;
+  int FrameRate() const override;
   int RgbWidth() override;
   int RgbHeight() override;
   int DepthWidth() override;
   int DepthHeight() override;
 
-  int NumFrames() override;
+  int NumFrames() const override;
   std::vector<unsigned char> GetRgbImage() override;
   std::vector<unsigned short> GetDepthImage() override;
+
+  std::shared_ptr<HumanModel> GetHumanModel() const override;
+  std::shared_ptr<HumanLabel> GetHumanLabel() const override;
 
   bool PreviousSequence() override;
   bool NextSequence() override;
   bool PreviousFrame() override;
   bool NextFrame() override;
 
+  Trajectory GetTrajectory() override;
+  void SaveTrajectory(Trajectory trajectory) override;
+
 private:
+  void LoadBody();
+
   std::string directory_;
 
   std::vector<std::string> sequence_names_;
@@ -50,6 +69,16 @@ private:
   int cached_depth_image_index_ = -1;
   std::vector<unsigned char> cached_rgb_image_;
   std::vector<unsigned short> cached_depth_image_;
+
+  // Human model for watch-n-patch dataset
+  std::shared_ptr<HumanModel> human_model_;
+  std::vector<std::shared_ptr<HumanLabel>> human_labels_;
+
+  // Data for the whole sequence
+  std::vector<Joints> joints_;
+  std::vector<int> joint_indices_;
+
+  bool body_loaded_ = false;
 };
 }
 

@@ -6,6 +6,7 @@ Trajectory::Trajectory(int num_joints, int num_timepoints, double time)
   : time_(time)
 {
   trajectory_.resize(num_joints, num_timepoints);
+  trajectory_.setZero();
 }
 
 Trajectory::~Trajectory() = default;

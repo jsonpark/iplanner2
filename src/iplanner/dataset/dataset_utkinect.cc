@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <fstream>
 
 #include <stb/stb_image.h>
 #include <tinyxml2/tinyxml2.h>
@@ -47,6 +48,34 @@ int ExtractFileIndex(const std::string& filename)
 UtKinect::UtKinect(const std::string& directory)
   : directory_(directory)
 {
+  // Human model
+  std::vector<std::string> joint_names
+  {
+    "Hip",
+    "Spine",
+    "ShouldersCenter",
+    "Head",
+    "LeftShoulder",
+    "LeftElbow",
+    "LeftWrist",
+    "LeftHand",
+    "RightShoulder",
+    "RightElbow",
+    "RightWrist",
+    "RightHand",
+    "LeftHip",
+    "LeftKnee",
+    "LeftAnkle",
+    "LeftFoot",
+    "RightHip",
+    "RightKnee",
+    "RightAnkle",
+    "RightFoot",
+  };
+
+  human_model_ = std::make_shared<HumanModel>(std::move(joint_names));
+
+
   // Get sequence names
   for (auto& it : fs::directory_iterator(directory + directory_character + "RGB" + directory_character))
   {
@@ -153,6 +182,96 @@ void UtKinect::SelectSequence(int idx)
     depth_image_indices_[i - min_frame] = depth_image_indices_[i];
   }
   num_frames_ = max_frame - min_frame + 1;
+
+
+  // Load body data
+  LoadBody();
+}
+
+void UtKinect::LoadBody()
+{
+  // Loading ground truth file
+  auto body_filename = directory_ + directory_character + "joints" + directory_character + "joints_" + sequence_names_[current_sequence_] + ".txt";
+
+  std::ifstream in(body_filename);
+
+  joints_.resize(10000);
+  joint_indices_.resize(10000);
+  std::fill(joint_indices_.begin(), joint_indices_.end(), -1);
+
+  int frame_index = 0;
+  while (true)
+  {
+    frame_index = -1;
+
+    in >> frame_index;
+
+    if (frame_index == -1)
+      break;
+
+    joint_indices_[frame_index] = frame_index;
+
+    for (int j = 0; j < num_joints_; j++)
+    {
+      in >> joints_[frame_index][j](0) >> joints_[frame_index][j](1) >> joints_[frame_index][j](2);
+
+      // The y-direction is flipped
+      joints_[frame_index][j](1) *= -1.;
+    }
+  }
+
+  in.close();
+
+  for (int i = 0; i < joint_indices_.size(); i++)
+  {
+    if (joint_indices_[i] == -1 && i > 0)
+      joint_indices_[i] = joint_indices_[i - 1];
+  }
+
+  for (int i = joint_indices_.size() - 2; i >= 0; i--)
+  {
+    if (joint_indices_[i] == -1)
+      joint_indices_[i] = joint_indices_[i + 1];
+  }
+
+  // Transform to Kinect space
+  Matrix4d transform;
+  transform.setIdentity();
+
+  transform.block(0, 3, 3, 1) = Vector3d(0., 0., -0.5);
+
+  // Convert joint coords to world space
+  human_labels_.resize(joint_indices_.size());
+  for (int i = 0; i < joint_indices_.size(); i++)
+  {
+    human_labels_[i] = nullptr;
+
+    if (joint_indices_[i] == i)
+    {
+      human_labels_[i] = std::make_shared<HumanLabel>(human_model_);
+
+      auto& human_label = *human_labels_[i];
+      for (int j = 0; j < num_joints_; j++)
+      {
+        const auto& joint = joints_[i][j];
+
+        if (joint.squaredNorm() < 1e-4)
+          human_label.Position(j).setZero();
+        else
+        {
+          // Transform from Qualysis space to Kinect space
+          Vector4d joint_homo;
+          joint_homo << joint, 1.;
+          joint_homo = transform * joint_homo;
+
+          // Convert milimeter to meter
+          human_label.Position(j) = joint_homo.block(0, 0, 3, 1);
+        }
+      }
+    }
+  }
+
+  body_loaded_ = true;
 }
 
 void UtKinect::SelectSequence(const std::string& name)
@@ -201,7 +320,7 @@ void UtKinect::SelectSequenceFrame(const std::string& name, const std::string& i
   std::cout << "UtKinect: could not find frame index \"" << index << "\"." << std::endl;
 }
 
-int UtKinect::FrameRate()
+int UtKinect::FrameRate() const
 {
   return 60;
 }
@@ -226,7 +345,7 @@ int UtKinect::DepthHeight()
   return 240;
 }
 
-int UtKinect::NumFrames()
+int UtKinect::NumFrames() const
 {
   return num_frames_;
 }
@@ -255,7 +374,6 @@ std::vector<unsigned short> UtKinect::GetDepthImage()
 
   cached_depth_image_index_ = depth_image_indices_[current_frame_];
 
-  // TODO
   auto filename = directory_ + directory_character + "depth" + directory_character + sequence_names_[current_sequence_] + directory_character + "depthImg" + std::to_string(cached_depth_image_index_) + ".xml";
 
   tinyxml2::XMLDocument doc;
@@ -272,15 +390,33 @@ std::vector<unsigned short> UtKinect::GetDepthImage()
   cached_depth_image_.resize(size);
   int depth;
 
-  for (int i = 0; i < size; i++)
+  // Flip y-axis direction
+  for (int i = 0; i < DepthHeight(); i++)
   {
-    iss >> depth;
+    for (int j = 0; j < DepthWidth(); j++)
+    {
+      const auto index = j + (DepthHeight() - i - 1) * DepthWidth();
 
-    // Distance unit change from x10000 to x1000
-    cached_depth_image_[i] = depth / 10;
+      iss >> depth;
+
+      // Distance unit change from x10000 to x1000
+      cached_depth_image_[index] = depth / 10;
+    }
   }
 
   return cached_depth_image_;
+}
+
+std::shared_ptr<HumanModel> UtKinect::GetHumanModel() const
+{
+  return human_model_;
+}
+
+std::shared_ptr<HumanLabel> UtKinect::GetHumanLabel() const
+{
+  // The color/depth's beginning indices are shifted to 0, but body indices are not
+  // So lookup the color index and then the body index
+  return human_labels_[joint_indices_[rgb_image_indices_[current_frame_]]];
 }
 
 bool UtKinect::PreviousSequence()
@@ -337,5 +473,14 @@ void UtKinect::SelectFrame(int frame)
 
   else
     current_frame_ = frame;
+}
+
+Trajectory UtKinect::GetTrajectory()
+{
+  return Dataset::GetTrajectory();
+}
+
+void UtKinect::SaveTrajectory(Trajectory trajectory)
+{
 }
 }

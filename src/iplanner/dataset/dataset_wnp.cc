@@ -200,6 +200,9 @@ void Wnp::SelectSequence(int idx)
 
   // Load body data
   LoadBody();
+
+  // Load trajectory data
+  LoadTrajectory();
 }
 
 void Wnp::LoadBody()
@@ -365,6 +368,27 @@ void Wnp::LoadBodyFromMatFile()
   */
 }
 
+void Wnp::LoadTrajectory()
+{
+  auto trajectory_filename = directory_ + directory_character + sequence_names_[current_sequence_] + directory_character + "robot_trajectory.txt";
+
+  if (fs::exists(trajectory_filename))
+  {
+    // TODO: load
+    std::cout << "Loading Robot Trajectory" << std::endl;
+  }
+  else
+  {
+    std::cout << "Robot trajectory file not found, loading initial trajectory" << std::endl;
+
+    double duration = CurrentSequenceLength();
+    int duration_ceil = static_cast<int>(std::ceil(duration)) + 1;
+
+    // TODO: num_joints (the fetch robot model has 11 active joints)
+    trajectory_ = std::make_unique<Trajectory>(11, duration_ceil, static_cast<double>(duration_ceil));
+  }
+}
+
 void Wnp::SelectSequence(const std::string& name)
 {
   for (int i = 0; i < sequence_names_.size(); i++)
@@ -410,7 +434,7 @@ void Wnp::SelectSequenceFrame(const std::string& name, const std::string& index)
   std::cout << "Wnp: could not find frame index \"" << index << "\"." << std::endl;
 }
 
-int Wnp::FrameRate()
+int Wnp::FrameRate() const
 {
   return 6;
 }
@@ -435,7 +459,7 @@ int Wnp::DepthHeight()
   return 424;
 }
 
-int Wnp::NumFrames()
+int Wnp::NumFrames() const
 {
   return num_frames_;
 }
@@ -468,7 +492,16 @@ std::vector<unsigned short> Wnp::GetDepthImage()
 
   auto filename = directory_ + directory_character + sequence_names_[current_sequence_] + directory_character + "depth_raw" + directory_character + ZeroPrependedString(4, cached_depth_image_index_) + ".raw";
   std::ifstream in(filename, std::ios::in | std::ios::binary);
-  in.read((char*)cached_depth_image_.data(), cached_depth_image_.size() * sizeof(unsigned short));
+
+  auto ptr = reinterpret_cast<char*>(cached_depth_image_.data());
+  for (int i = 0; i < DepthHeight(); i++)
+  {
+    int index = (DepthHeight() - i - 1) * DepthWidth();
+
+    // Type of ptr is (char*), whose index would have been counted as the type were (unsigned short*).
+    in.read(ptr + index * sizeof(unsigned short), DepthWidth() * sizeof(unsigned short));
+  }
+
   in.close();
 
   /*
@@ -583,5 +616,28 @@ void Wnp::SelectFrame(int frame)
 
   else
     current_frame_ = frame;
+}
+
+Trajectory Wnp::GetTrajectory()
+{
+  if (trajectory_ == nullptr)
+    return Dataset::GetTrajectory();
+
+  return *trajectory_;
+}
+
+void Wnp::SaveTrajectory(Trajectory trajectory)
+{
+  auto trajectory_filename = directory_ + directory_character + sequence_names_[current_sequence_] + directory_character + "robot_trajectory.txt";
+
+  if (fs::exists(trajectory_filename))
+  {
+    // TODO: load
+    std::cout << "Overwriting robot trajectory file" << std::endl;
+  }
+  else
+  {
+    std::cout << "Create a robot trajectory file" << std::endl;
+  }
 }
 }

@@ -169,6 +169,8 @@ void DatasetOcclusion::LoadBody()
       in >> joints_[i][j](0) >> joints_[i][j](1) >> joints_[i][j](2);
   }
 
+  in.close();
+
   // Transform from Qualysis space to Kinect space
   Matrix4d transform;
   transform(3, 3) = 1.;
@@ -213,8 +215,6 @@ void DatasetOcclusion::LoadBody()
       }
     }
   }
-
-  in.close();
 
   body_loaded_ = true;
 }
@@ -265,7 +265,7 @@ void DatasetOcclusion::SelectSequenceFrame(const std::string& name, const std::s
   std::cout << "Occlusion Dataset: could not find frame index \"" << index << "\"." << std::endl;
 }
 
-int DatasetOcclusion::FrameRate()
+int DatasetOcclusion::FrameRate() const
 {
   return 15;
 }
@@ -290,7 +290,7 @@ int DatasetOcclusion::DepthHeight()
   return 480;
 }
 
-int DatasetOcclusion::NumFrames()
+int DatasetOcclusion::NumFrames() const
 {
   return num_frames_;
 }
@@ -396,5 +396,14 @@ void DatasetOcclusion::SelectFrame(int frame)
 
   else
     current_frame_ = frame;
+}
+
+Trajectory DatasetOcclusion::GetTrajectory()
+{
+  return Dataset::GetTrajectory();
+}
+
+void DatasetOcclusion::SaveTrajectory(Trajectory trajectory)
+{
 }
 }

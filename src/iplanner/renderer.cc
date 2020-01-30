@@ -163,7 +163,7 @@ void Renderer::Render()
 
   // Rendering color camera image to texture
   framebuffer_color_->Use();
-  glClearColor(0.8f, 0.8f, 0.8f, 1.0f);
+  glClearColor(1.f, 1.f, 1.f, 1.f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glViewport(0, 0, color_camera_resolution_(0), color_camera_resolution_(1));
 
@@ -199,7 +199,6 @@ void Renderer::Render()
   // Rendering to the screen
 
   Framebuffer::UseScreen();
-  glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   
   // Full screen viewport
@@ -462,9 +461,12 @@ void Renderer::TraverseSceneNode(std::shared_ptr<SceneNode> node, Affine3d trans
   }
   else if (node->IsHumanLabelNode())
   {
-    human_label_node_ = std::static_pointer_cast<HumanLabelNode>(node);
-    human_label_ = human_label_node_->GetLabel();
-    human_label_transform_ = transform;
+    if (node->IsShown())
+    {
+      human_label_node_ = std::static_pointer_cast<HumanLabelNode>(node);
+      human_label_ = human_label_node_->GetLabel();
+      human_label_transform_ = transform;
+    }
   }
 
   for (auto child_node : node->GetChildren())

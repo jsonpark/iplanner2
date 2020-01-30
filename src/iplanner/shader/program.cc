@@ -112,6 +112,12 @@ void Program::Uniform2f(const std::string& name, const Vector2f& v)
   glUniform2fv(glGetUniformLocation(id_, name.c_str()), 1, v.data());
 }
 
+void Program::Uniform2i(const std::string& name, int i0, int i1)
+{
+  Use();
+  glUniform2i(glGetUniformLocation(id_, name.c_str()), i0, i1);
+}
+
 void Program::Uniform3f(const std::string& name, const Vector3f& v)
 {
   Use();

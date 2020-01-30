@@ -34,6 +34,21 @@ public:
     return false;
   }
 
+  bool IsShown() const noexcept
+  {
+    return is_shown_;
+  }
+
+  void Show() noexcept
+  {
+    is_shown_ = true;
+  }
+
+  void Hide() noexcept
+  {
+    is_shown_ = false;
+  }
+
   const auto& GetTransform() const
   {
     return transform_;
@@ -66,6 +81,8 @@ public:
 
 private:
   Affine3d transform_ = Affine3d::Identity();
+
+  bool is_shown_ = true;
 
   std::weak_ptr<SceneNode> parent_;
   std::vector<std::shared_ptr<SceneNode>> children_;

@@ -29,8 +29,9 @@ int ExtractFileIndex(const std::string& filename)
 
 int main()
 {
-  constexpr bool depth_conversion = false;
-  constexpr bool body_conversion = true;
+  constexpr bool depth_conversion = true;
+  constexpr bool body_conversion = false;
+  constexpr bool overwrite = true;
 
   std::string directory = "..\\..\\dataset\\watch-n-patch";
   constexpr char directory_character = '\\';
@@ -80,7 +81,7 @@ int main()
           continue;
 
         // To overwrite raw file, comment these lines
-        if (fs::exists(directory + directory_character + sequence_name + directory_character + "depth_raw\\" + short_filename.substr(0, short_filename.length() - 4) + ".raw"))
+        if (!overwrite && fs::exists(directory + directory_character + sequence_name + directory_character + "depth_raw\\" + short_filename.substr(0, short_filename.length() - 4) + ".raw"))
           continue;
 
         matlab->eval(u"load " + matlab::engine::convertUTF8StringToUTF16String(filename));
@@ -88,9 +89,11 @@ int main()
         matlab::data::TypedArray<double> depth = matlab->getVariable("depth");
         auto dim = depth.getDimensions();
 
+        // 424x512 matrix
+        // Save to raw data in row-major from top-left to bottom-right
         int buffer_idx = 0;
-        for (int j = 0; j < dim[1]; j++)
-          for (int i = 0; i < dim[0]; i++)
+        for (int i = 0; i < dim[0]; i++)
+          for (int j = 0; j < dim[1]; j++)
             buffer[buffer_idx++] = static_cast<unsigned short>(depth[i][j]);
 
         std::cout << "output file path: " << directory + directory_character + sequence_name + directory_character + "depth_raw\\" + short_filename.substr(0, short_filename.length() - 4) + ".raw" << std::endl;
@@ -115,7 +118,7 @@ int main()
       std::string struct_filename = directory + directory_character + sequence_name + directory_character + "body.struct";
 
       // To overwrite raw file, comment these lines
-      if (fs::exists(struct_filename))
+      if (!overwrite && fs::exists(struct_filename))
         continue;
 
       matlab->eval(u"load " + matlab::engine::convertUTF8StringToUTF16String(mat_filename));

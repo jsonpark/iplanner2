@@ -1,5 +1,7 @@
 #include "iplanner/dataset/dataset.h"
 
+#include <iostream>
+
 namespace iplanner
 {
 Dataset::Dataset() = default;
@@ -23,7 +25,7 @@ void Dataset::SelectFrame(int index)
 {
 }
 
-int Dataset::FrameRate()
+int Dataset::FrameRate() const
 {
   return 60;
 }
@@ -49,7 +51,7 @@ int Dataset::DepthHeight()
   return 424;
 }
 
-int Dataset::NumFrames()
+int Dataset::NumFrames() const
 {
   return 10;
 }
@@ -92,5 +94,20 @@ std::shared_ptr<HumanModel> Dataset::GetHumanModel() const
 std::shared_ptr<HumanLabel> Dataset::GetHumanLabel() const
 {
   return nullptr;
+}
+
+double Dataset::CurrentSequenceLength() const
+{
+  return static_cast<double>(NumFrames()) / FrameRate();
+}
+
+Trajectory Dataset::GetTrajectory()
+{
+  return Trajectory(9, 5, 1.);
+}
+
+void Dataset::SaveTrajectory(Trajectory trajectory)
+{
+  std::cout << "Dataset base class SaveTrajectory" << std::endl;
 }
 }

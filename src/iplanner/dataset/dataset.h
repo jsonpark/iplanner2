@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "iplanner/human/human_label.h"
+#include "iplanner/plan/trajectory.h"
 
 namespace iplanner
 {
@@ -20,13 +21,13 @@ public:
   virtual void SelectSequence(const std::string& name);
   virtual void SelectFrame(int index);
 
-  virtual int FrameRate();
+  virtual int FrameRate() const;
   virtual int RgbWidth();
   virtual int RgbHeight();
   virtual int DepthWidth();
   virtual int DepthHeight();
 
-  virtual int NumFrames();
+  virtual int NumFrames() const;
   virtual std::vector<unsigned char> GetRgbImage();
   virtual std::vector<unsigned short> GetDepthImage();
 
@@ -37,6 +38,11 @@ public:
   virtual bool NextSequence();
   virtual bool PreviousFrame();
   virtual bool NextFrame();
+
+  virtual Trajectory GetTrajectory();
+  virtual void SaveTrajectory(Trajectory trajectory);
+
+  virtual double CurrentSequenceLength() const;
 
 private:
 };
