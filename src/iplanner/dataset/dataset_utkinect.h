@@ -17,6 +17,8 @@ public:
   int NumSequences() override;
   void SelectSequence(int idx) override;
   void SelectSequence(const std::string& name) override;
+  void SelectSequenceFrame(const std::string& name, const std::string& index);
+  void SelectFrame(int frame) override;
 
   int FrameRate() override;
   int RgbWidth() override;

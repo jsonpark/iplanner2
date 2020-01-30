@@ -213,47 +213,62 @@ void Engine::Keyboard(Key key, KeyAction action, int mods)
 
       // Numpad (KP_x) sets a dataset
     case Key::KP_1:
-      if (dataset_ != dataset_utkinect_)
-      {
-        dataset_ = dataset_utkinect_;
-        rgbd_camera_ = kinect_; // TODO: change to kinect v1
-
-        animation_time_ = 0.;
-        animation_start_time_ = glfwGetTime();
-        animation_ = false;
-
-        dataset_changed_ = true;
-      }
+      ChooseUtKinect();
       break;
 
     case Key::KP_2:
-      if (dataset_ != dataset_wnp_)
-      {
-        dataset_ = dataset_wnp_;
-        rgbd_camera_ = kinect_;
-
-        animation_time_ = 0.;
-        animation_start_time_ = glfwGetTime();
-        animation_ = false;
-
-        dataset_changed_ = true;
-      }
+      ChooseWnp();
       break;
 
     case Key::KP_3:
-      if (dataset_ != dataset_occlusion_)
-      {
-        dataset_ = dataset_occlusion_;
-        rgbd_camera_ = fake_kinect_;
-
-        animation_time_ = 0.;
-        animation_start_time_ = glfwGetTime();
-        animation_ = false;
-
-        dataset_changed_ = true;
-      }
+      ChooseOcclusion();
       break;
     }
+  }
+}
+
+void Engine::ChooseUtKinect()
+{
+  if (dataset_ != dataset_utkinect_)
+  {
+    dataset_ = dataset_utkinect_;
+    rgbd_camera_ = kinect_v1_;
+
+    animation_time_ = 0.;
+    animation_start_time_ = glfwGetTime();
+    animation_ = false;
+
+    dataset_changed_ = true;
+  }
+}
+
+void Engine::ChooseWnp()
+{
+  if (dataset_ != dataset_wnp_)
+  {
+    dataset_ = dataset_wnp_;
+    rgbd_camera_ = kinect_v2_;
+
+    animation_time_ = 0.;
+    animation_start_time_ = glfwGetTime();
+    animation_ = false;
+
+    dataset_changed_ = true;
+  }
+}
+
+void Engine::ChooseOcclusion()
+{
+  if (dataset_ != dataset_occlusion_)
+  {
+    dataset_ = dataset_occlusion_;
+    rgbd_camera_ = fake_kinect_;
+
+    animation_time_ = 0.;
+    animation_start_time_ = glfwGetTime();
+    animation_ = false;
+
+    dataset_changed_ = true;
   }
 }
 
@@ -279,8 +294,27 @@ void Engine::SaveImageSamples()
     std::cout << image_sample.dataset << ' '
       << image_sample.sequence << ' ' << image_sample.index << std::endl;
 
-    if (image_sample.dataset == "wnp")
+    if (image_sample.dataset == "utkinect")
     {
+      ChooseUtKinect();
+
+      dataset_utkinect_->SelectSequenceFrame(image_sample.sequence, image_sample.index);
+
+      Update();
+
+      renderer_->Render();
+
+      std::string filename = image_sample.dataset + '-' + image_sample.sequence + '-' + image_sample.index;
+      std::replace(filename.begin(), filename.end(), '\\', '-');
+      std::cout << "Saving to " << filename << "*.* ... ";
+      renderer_->SaveImages(config_.GetImageSampleSaveDirectory(), filename);
+      std::cout << "Finished!" << std::endl;
+    }
+
+    else if (image_sample.dataset == "wnp")
+    {
+      ChooseWnp();
+
       dataset_wnp_->SelectSequenceFrame(image_sample.sequence, image_sample.index);
 
       Update();
@@ -289,19 +323,26 @@ void Engine::SaveImageSamples()
 
       std::string filename = image_sample.dataset + '-' + image_sample.sequence + '-' + image_sample.index;
       std::replace(filename.begin(), filename.end(), '\\', '-');
-      std::cout << "Saving to " << filename << "*.*" << std::endl;
+      std::cout << "Saving to " << filename << "*.* ... ";
       renderer_->SaveImages(config_.GetImageSampleSaveDirectory(), filename);
-      std::cout << "Finished saving images" << std::endl;
-    }
-
-    else if (image_sample.dataset == "utkinect")
-    {
-      // TODO
+      std::cout << "Finished!" << std::endl;
     }
 
     else if (image_sample.dataset == "occlusion")
     {
-      // TODO
+      ChooseOcclusion();
+
+      dataset_occlusion_->SelectSequenceFrame(image_sample.sequence, image_sample.index);
+
+      Update();
+
+      renderer_->Render();
+
+      std::string filename = image_sample.dataset + '-' + image_sample.sequence + '-' + image_sample.index;
+      std::replace(filename.begin(), filename.end(), '\\', '-');
+      std::cout << "Saving to " << filename << "*.* ... ";
+      renderer_->SaveImages(config_.GetImageSampleSaveDirectory(), filename);
+      std::cout << "Finished!" << std::endl;
     }
   }
 
@@ -563,7 +604,8 @@ void Engine::Initialize()
   dataset_ = dataset_occlusion_;
 
   // Camera
-  kinect_ = std::make_shared<KinectV2>();
+  kinect_v1_ = std::make_shared<KinectV1>();
+  kinect_v2_ = std::make_shared<KinectV2>();
   fake_kinect_ = std::make_shared<FakeKinect>();
 
   rgbd_camera_ = fake_kinect_;
@@ -578,6 +620,15 @@ void Engine::Initialize()
 
   // Scene
   InitializeScene();
+
+  // Planner
+  planner_ = std::make_shared<Planner>();
+  planner_->SetRobotModel(robot_arm_model_);
+  planner_->Config().num_timepoints = 6;
+  planner_->Config().prediction_timestep = 0.5;
+  planner_->Config().time = 5.;
+
+  planner_->RunAsync();
 }
 
 void Engine::InitializeScene()

@@ -208,6 +208,9 @@
     <ClCompile Include="..\src\iplanner\plan\trajectory.cc">
       <Filter>src\iplanner\plan</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\iplanner\sensor\kinect_v1.cc">
+      <Filter>src\iplanner\sensor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\iplanner\utils\json.h">
@@ -350,6 +353,9 @@
     </ClInclude>
     <ClInclude Include="..\src\iplanner\plan\trajectory.h">
       <Filter>src\iplanner\plan</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\iplanner\sensor\kinect_v1.h">
+      <Filter>src\iplanner\sensor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -8,6 +8,22 @@
   "image_sample_save_directory": "..\\figs",
   "image_samples": [
     {
+      "dataset": "utkinect",
+      "sequence": "s01_e01",
+      "index": "1164"
+    },
+    {
+      "dataset": "utkinect",
+      "sequence": "s04_e02",
+      "index": "4042"
+    },
+    {
+      "dataset": "utkinect",
+      "sequence": "s08_e02",
+      "index": "614"
+    },
+
+    {
       "dataset": "wnp",
       "sequence": "kitchen1\\data_01-21-56",
       "index": "0029"
@@ -22,10 +38,21 @@
       "sequence": "kitchen2\\data_04-48-46",
       "index": "0074"
     },
+
     {
-      "dataset": "wnp",
-      "sequence": "office\\data_11-13-19",
-      "index": "0086"
+      "dataset": "occlusion",
+      "sequence": "abdallah2BodyWalk1",
+      "index": "232"
+    },
+    {
+      "dataset": "occlusion",
+      "sequence": "abdallah2BodyWalk2",
+      "index": "272"
+    },
+    {
+      "dataset": "occlusion",
+      "sequence": "abdallah2BodyWalk3",
+      "index": "571"
     }
   ]
 }

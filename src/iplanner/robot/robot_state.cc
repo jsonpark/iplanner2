@@ -4,8 +4,8 @@ namespace iplanner
 {
 RobotState::RobotState(std::shared_ptr<RobotModel> robot_model)
   : robot_model_(robot_model),
-  position_(robot_model_->joints_.size(), 0.),
-  fk_transforms_(robot_model_->links_.size())
+  position_(robot_model->joints_.size(), 0.),
+  fk_transforms_(robot_model->links_.size())
 {
 }
 

@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include <stb/stb_image.h>
+#include <tinyxml2/tinyxml2.h>
 
 #ifdef _WIN32
 namespace fs = std::filesystem;
@@ -168,6 +169,38 @@ void UtKinect::SelectSequence(const std::string& name)
   std::cout << "UtKinect: could not find sequence name \"" << name << "\"." << std::endl;
 }
 
+void UtKinect::SelectSequenceFrame(const std::string& name, const std::string& index)
+{
+  bool sequence_found = false;
+  for (int i = 0; i < sequence_names_.size(); i++)
+  {
+    if (sequence_names_[i] == name)
+    {
+      SelectSequence(i);
+      sequence_found = true;
+      break;
+    }
+  }
+
+  if (!sequence_found)
+  {
+    std::cout << "UtKinect: could not find sequence name \"" << name << "\"." << std::endl;
+    return;
+  }
+
+  auto index_integer = std::atoi(index.c_str());
+  for (int i = 0; i < num_frames_; i++)
+  {
+    if (rgb_image_indices_[i] == index_integer)
+    {
+      SelectFrame(i);
+      return;
+    }
+  }
+
+  std::cout << "UtKinect: could not find frame index \"" << index << "\"." << std::endl;
+}
+
 int UtKinect::FrameRate()
 {
   return 60;
@@ -225,6 +258,28 @@ std::vector<unsigned short> UtKinect::GetDepthImage()
   // TODO
   auto filename = directory_ + directory_character + "depth" + directory_character + sequence_names_[current_sequence_] + directory_character + "depthImg" + std::to_string(cached_depth_image_index_) + ".xml";
 
+  tinyxml2::XMLDocument doc;
+  doc.LoadFile(filename.c_str());
+
+  const char* str = doc.FirstChildElement("opencv_storage")
+    ->FirstChildElement() // (depthImgXXX)
+    ->FirstChildElement("data")
+    ->GetText();
+
+  std::istringstream iss(str);
+
+  const int size = DepthWidth() * DepthHeight();
+  cached_depth_image_.resize(size);
+  int depth;
+
+  for (int i = 0; i < size; i++)
+  {
+    iss >> depth;
+
+    // Distance unit change from x10000 to x1000
+    cached_depth_image_[i] = depth / 10;
+  }
+
   return cached_depth_image_;
 }
 
@@ -270,5 +325,17 @@ bool UtKinect::NextFrame()
   }
 
   return false;
+}
+
+void UtKinect::SelectFrame(int frame)
+{
+  if (frame < 0)
+    current_frame_ = 0;
+
+  else if (frame > num_frames_ - 1)
+    current_frame_ = num_frames_ - 1;
+
+  else
+    current_frame_ = frame;
 }
 }

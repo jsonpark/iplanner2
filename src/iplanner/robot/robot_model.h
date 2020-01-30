@@ -129,6 +129,11 @@ public:
 
   RobotModel FixJoints(const std::vector<std::string>& fixed_joints, const std::vector<double>& joint_values);
 
+  int NumJoints()
+  {
+    return joints_.size();
+  }
+
   // Print infos
   void PrintRobotLinks() const;
   void PrintRobotJoints() const;

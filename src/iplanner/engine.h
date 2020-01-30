@@ -15,6 +15,7 @@
 #include "iplanner/dataset/dataset_wnp.h"
 #include "iplanner/dataset/dataset_utkinect.h"
 #include "iplanner/dataset/dataset_occlusion.h"
+#include "iplanner/sensor/kinect_v1.h"
 #include "iplanner/sensor/kinect_v2.h"
 #include "iplanner/sensor/fake_kinect.h"
 #include "iplanner/plan/planner.h"
@@ -208,6 +209,10 @@ private:
   void Initialize();
   void InitializeScene();
 
+  void ChooseUtKinect();
+  void ChooseWnp();
+  void ChooseOcclusion();
+
   void Update();
   void UpdateScene();
 
@@ -267,7 +272,8 @@ private:
 
   // Sensor
   std::shared_ptr<RgbdCamera> rgbd_camera_;
-  std::shared_ptr<KinectV2> kinect_;
+  std::shared_ptr<KinectV1> kinect_v1_;
+  std::shared_ptr<KinectV2> kinect_v2_;
   std::shared_ptr<FakeKinect> fake_kinect_;
 
   // Human
