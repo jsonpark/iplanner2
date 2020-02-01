@@ -134,6 +134,17 @@ public:
     return joints_.size();
   }
 
+  // Data accessor
+  const auto& Link(int idx) const
+  {
+    return links_[idx];
+  }
+
+  const auto& Joint(int idx) const
+  {
+    return joints_[idx];
+  }
+
   // Print infos
   void PrintRobotLinks() const;
   void PrintRobotJoints() const;

@@ -324,7 +324,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\dataset\occlusion\abdallah2BodyWalk1\qualisys.tsv" />
-    <None Include="..\..\dataset\watch-n-patch\kitchen1\data_01-05-11\body.struct" />
+    <None Include="..\..\dataset\watch-n-patch\kitchen1\data_03-31-37\body.struct" />
     <None Include="..\..\fetch_ros\fetch_description\robots\fetch.urdf" />
     <None Include="..\.gitignore" />
     <None Include="..\config\config.json" />
@@ -359,7 +359,16 @@
   <ItemGroup>
     <Text Include="..\..\dataset\occlusion\abdallah2BodyWalk1\groundTruth.txt" />
     <Text Include="..\..\dataset\occlusion\abdallah2BodyWalk1\rgb_depth_pos.txt" />
+    <Text Include="..\..\dataset\occlusion\abdallah2BodyWalk1\robot_trajectory.txt" />
     <Text Include="..\..\dataset\utkinect\joints\joints_s01_e01.txt" />
+    <Text Include="..\..\dataset\utkinect\trajectories\robot_trajectory_s01_e01-no.txt" />
+    <Text Include="..\..\dataset\utkinect\trajectories\robot_trajectory_s01_e01.txt" />
+    <Text Include="..\..\dataset\utkinect\trajectories\robot_trajectory_s04_e02-no.txt" />
+    <Text Include="..\..\dataset\utkinect\trajectories\robot_trajectory_s04_e02.txt" />
+    <Text Include="..\..\dataset\watch-n-patch\kitchen1\data_03-31-37-no\robot_trajectory - Copy (2).txt" />
+    <Text Include="..\..\dataset\watch-n-patch\kitchen1\data_03-31-37-no\robot_trajectory.txt" />
+    <Text Include="..\..\dataset\watch-n-patch\kitchen1\data_03-31-37\robot_trajectory - Copy (2).txt" />
+    <Text Include="..\..\dataset\watch-n-patch\kitchen1\data_03-31-37\robot_trajectory.txt" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\..\dataset\utkinect\depth\s01_e01\depthImg190.xml" />

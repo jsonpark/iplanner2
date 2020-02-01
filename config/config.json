@@ -5,7 +5,9 @@
     "occlusion":  "..\\..\\dataset\\occlusion"
   },
 
-  "image_sample_save_directory": "..\\figs",
+  "video_save_direcotory": "..\\videos",
+
+  "image_sample_save_directory": "..\\figs\\samples",
   "image_samples": [
     {
       "dataset": "utkinect",

@@ -86,6 +86,12 @@
     <Filter Include="resource\dataset_sample\utkinect">
       <UniqueIdentifier>{a8e09941-549d-49d9-86dc-40cfc658faa8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resource\dataset_sample\watch-n-patch\no-occlusion">
+      <UniqueIdentifier>{bc75655f-8b75-4bcd-a094-f2f57b83f6fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\dataset_sample\utkinect\no-occlusion">
+      <UniqueIdentifier>{75324a18-efa3-4ba2-9cab-0cfd4766acc2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\lib\glad\glad.c">
@@ -452,9 +458,6 @@
     <None Include="..\config\config.json">
       <Filter>resource\config</Filter>
     </None>
-    <None Include="..\..\dataset\watch-n-patch\kitchen1\data_01-05-11\body.struct">
-      <Filter>resource\dataset_sample\watch-n-patch</Filter>
-    </None>
     <None Include="..\..\dataset\occlusion\abdallah2BodyWalk1\qualisys.tsv">
       <Filter>resource\dataset_sample\occlusion</Filter>
     </None>
@@ -463,6 +466,9 @@
     </None>
     <None Include="..\src\shader\planar.vert">
       <Filter>shader</Filter>
+    </None>
+    <None Include="..\..\dataset\watch-n-patch\kitchen1\data_03-31-37\body.struct">
+      <Filter>resource\dataset_sample\watch-n-patch</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -474,6 +480,33 @@
     </Text>
     <Text Include="..\..\dataset\utkinect\joints\joints_s01_e01.txt">
       <Filter>resource\dataset_sample\utkinect</Filter>
+    </Text>
+    <Text Include="..\..\dataset\occlusion\abdallah2BodyWalk1\robot_trajectory.txt">
+      <Filter>resource\dataset_sample\occlusion</Filter>
+    </Text>
+    <Text Include="..\..\dataset\watch-n-patch\kitchen1\data_03-31-37\robot_trajectory.txt">
+      <Filter>resource\dataset_sample\watch-n-patch</Filter>
+    </Text>
+    <Text Include="..\..\dataset\watch-n-patch\kitchen1\data_03-31-37-no\robot_trajectory.txt">
+      <Filter>resource\dataset_sample\watch-n-patch\no-occlusion</Filter>
+    </Text>
+    <Text Include="..\..\dataset\utkinect\trajectories\robot_trajectory_s01_e01-no.txt">
+      <Filter>resource\dataset_sample\utkinect\no-occlusion</Filter>
+    </Text>
+    <Text Include="..\..\dataset\utkinect\trajectories\robot_trajectory_s01_e01.txt">
+      <Filter>resource\dataset_sample\utkinect</Filter>
+    </Text>
+    <Text Include="..\..\dataset\utkinect\trajectories\robot_trajectory_s04_e02-no.txt">
+      <Filter>resource\dataset_sample\utkinect\no-occlusion</Filter>
+    </Text>
+    <Text Include="..\..\dataset\utkinect\trajectories\robot_trajectory_s04_e02.txt">
+      <Filter>resource\dataset_sample\utkinect</Filter>
+    </Text>
+    <Text Include="..\..\dataset\watch-n-patch\kitchen1\data_03-31-37\robot_trajectory - Copy (2).txt">
+      <Filter>resource\dataset_sample\watch-n-patch</Filter>
+    </Text>
+    <Text Include="..\..\dataset\watch-n-patch\kitchen1\data_03-31-37-no\robot_trajectory - Copy (2).txt">
+      <Filter>resource\dataset_sample\watch-n-patch\no-occlusion</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>

@@ -74,11 +74,11 @@ Affine3d RobotJoint::GetTransform(double joint_value) const
 
   case Type::CONTINUOUS:
   case Type::REVOLUTE:
-    t.prerotate(AngleAxisd(joint_value, axis_));
+    t.rotate(AngleAxisd(joint_value, axis_));
     break;
 
   case Type::PRISMATIC:
-    t.pretranslate(axis_ * joint_value);
+    t.translate(axis_ * joint_value);
     break;
 
   default:

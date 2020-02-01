@@ -26,6 +26,8 @@ void Config::Load(const std::string& filename)
     dataset_directories_[key] = dataset_directory_json.Get<std::string>();
   }
 
+  video_save_direcotory_ = json["video_save_direcotory"].Get<std::string>();
+
   image_sample_save_directory_ = json["image_sample_save_directory"].Get<std::string>();
   auto& image_samples_json = json["image_samples"];
   for (int i = 0; i < image_samples_json.Size(); i++)

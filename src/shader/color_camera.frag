@@ -39,6 +39,11 @@ uniform bool has_diffuse_texture;
 uniform sampler2D diffuse_texture;
 uniform vec3 eye_position;
 
+// Transparent red for getting result
+const float red_alpha = 0.5f;
+uniform bool overlay_color_red;
+uniform bool overlay_color_blue;
+
 out vec4 out_color;
 
 vec3 calc_directional_light(Light light, vec3 material_diffuse, vec3 n, vec3 v)
@@ -101,6 +106,12 @@ void main()
   }
 
   out_color = vec4(light_color, 1.f);
+
+  if (overlay_color_red)
+    out_color = (1. - red_alpha) * out_color + red_alpha * vec4(1.f, 0.f, 0.f, 1.f);
+    
+  if (overlay_color_blue)
+    out_color = (1. - red_alpha) * out_color + red_alpha * vec4(0.f, 0.f, 1.f, 1.f);
 
   //out_color = vec4(texture(diffuse_texture, frag_tex_coord).rgb, 1.f);
 }

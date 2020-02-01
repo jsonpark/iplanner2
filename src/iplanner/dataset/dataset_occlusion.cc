@@ -148,6 +148,9 @@ void DatasetOcclusion::SelectSequence(int idx)
 
   // Load body data
   LoadBody();
+
+  // Load trajectory
+  LoadTrajectory();
 }
 
 void DatasetOcclusion::LoadBody()
@@ -263,6 +266,11 @@ void DatasetOcclusion::SelectSequenceFrame(const std::string& name, const std::s
   }
 
   std::cout << "Occlusion Dataset: could not find frame index \"" << index << "\"." << std::endl;
+}
+
+std::string DatasetOcclusion::GetCurrentSequenceName() const
+{
+  return sequence_names_[current_sequence_];
 }
 
 int DatasetOcclusion::FrameRate() const
@@ -400,10 +408,39 @@ void DatasetOcclusion::SelectFrame(int frame)
 
 Trajectory DatasetOcclusion::GetTrajectory()
 {
-  return Dataset::GetTrajectory();
+  return *trajectory_;
 }
+
+void DatasetOcclusion::LoadTrajectory()
+{
+  std::string filename = directory_ + directory_character + sequence_names_[current_sequence_] + directory_character + "robot_trajectory.txt";
+
+  if (fs::exists(filename))
+  {
+    std::cout << "Occlusion: Loading Robot Trajectory" << std::endl;
+    trajectory_ = std::make_unique<Trajectory>(Dataset::LoadTrajectory(filename));
+  }
+  else
+  {
+    std::cout << "Occlusion: Robot trajectory file not found, loading initial trajectory" << std::endl;
+
+    double duration = CurrentSequenceLength();
+    int duration_ceil = static_cast<int>(std::ceil(duration)) + 1;
+
+    // TODO: num_joints (the fetch robot model has 12 active joints)
+    trajectory_ = std::make_unique<Trajectory>(12, duration_ceil, static_cast<double>(duration_ceil));
+  }
+}
+
 
 void DatasetOcclusion::SaveTrajectory(Trajectory trajectory)
 {
+  std::string filename = directory_ + directory_character + sequence_names_[current_sequence_] + directory_character + "robot_trajectory.txt";
+  Dataset::SaveTrajectory(trajectory, filename);
+}
+
+double DatasetOcclusion::CurrentTime() const
+{
+  return static_cast<double>(current_frame_) / FrameRate();
 }
 }

@@ -183,9 +183,14 @@ void UtKinect::SelectSequence(int idx)
   }
   num_frames_ = max_frame - min_frame + 1;
 
+  std::cout << "num frames: " << num_frames_ << std::endl
+    << "video length: " << CurrentSequenceLength() << std::endl;
 
   // Load body data
   LoadBody();
+
+  // Load robot trajectory
+  LoadTrajectory();
 }
 
 void UtKinect::LoadBody()
@@ -318,6 +323,11 @@ void UtKinect::SelectSequenceFrame(const std::string& name, const std::string& i
   }
 
   std::cout << "UtKinect: could not find frame index \"" << index << "\"." << std::endl;
+}
+
+std::string UtKinect::GetCurrentSequenceName() const
+{
+  return sequence_names_[current_sequence_];
 }
 
 int UtKinect::FrameRate() const
@@ -477,10 +487,53 @@ void UtKinect::SelectFrame(int frame)
 
 Trajectory UtKinect::GetTrajectory()
 {
-  return Dataset::GetTrajectory();
+  return *trajectory_;
+}
+
+void UtKinect::LoadTrajectory()
+{
+  auto filename = directory_ + directory_character + "trajectories" + directory_character + "robot_trajectory_" + sequence_names_[current_sequence_] + ".txt";
+
+  if (fs::exists(filename))
+  {
+    std::cout << "UtKinect: Loading Robot Trajectory" << std::endl;
+
+    std::ifstream in(filename);
+
+    int rows, cols;
+    double time;
+    in >> rows >> cols >> time;
+
+    trajectory_ = std::make_unique<Trajectory>(rows, cols, time);
+
+    for (int j = 0; j < cols; j++)
+    {
+      for (int i = 0; i < rows; i++)
+        in >> (*trajectory_)(i, j);
+    }
+
+    in.close();
+  }
+  else
+  {
+    std::cout << "UtKinect: Robot trajectory file not found, loading initial trajectory" << std::endl;
+
+    double duration = CurrentSequenceLength();
+    int duration_ceil = static_cast<int>(std::ceil(duration)) + 1;
+
+    // TODO: num_joints (the fetch robot model has 12 active joints)
+    trajectory_ = std::make_unique<Trajectory>(12, duration_ceil, static_cast<double>(duration_ceil));
+  }
 }
 
 void UtKinect::SaveTrajectory(Trajectory trajectory)
 {
+  std::string trajectory_filename = directory_ + directory_character + "trajectories" + directory_character + "robot_trajectory_" + sequence_names_[current_sequence_] + ".txt";
+  Dataset::SaveTrajectory(trajectory, trajectory_filename);
+}
+
+double UtKinect::CurrentTime() const
+{
+  return static_cast<double>(current_frame_) / FrameRate();
 }
 }

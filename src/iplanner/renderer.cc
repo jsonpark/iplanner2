@@ -31,6 +31,11 @@ void Renderer::Initialize()
   glEnable(GL_LINE_SMOOTH);
 
 
+  // 
+  pointcloud_robot_transform_.setIdentity();
+  pointcloud_robot_transform_.translate(Vector3d(0.8, 0., 0.));
+
+
   // Uniform block setup
   color_camera_uniform_.AddMember(UniformBuffer::Type::MAT4, "projection");
   color_camera_uniform_.AddMember(UniformBuffer::Type::MAT4, "view");
@@ -170,6 +175,8 @@ void Renderer::Render()
   program_color_camera_->Use();
   program_color_camera_->BindUniformBuffer(0, color_camera_uniform_);
   program_color_camera_->Uniform3f("eye_position", color_camera->GetEye());
+  program_color_camera_->Uniform1i("overlay_color_red", overlay_color_red_);
+  program_color_camera_->Uniform1i("overlay_color_blue", overlay_color_blue_);
   program_color_point_cloud_->Uniform1f("point_size", 1.5f);
   program_color_point_cloud_->BindUniformBuffer(0, color_camera_uniform_);
   program_human_edge_->BindUniformBuffer(0, color_camera_uniform_);
@@ -214,13 +221,15 @@ void Renderer::Render()
     program_color_camera_->Use();
     program_color_camera_->BindUniformBuffer(0, view_camera_uniform_);
     program_color_camera_->Uniform3f("eye_position", view_camera->GetEye());
+    program_color_camera_->Uniform1i("overlay_color_red", overlay_color_red_);
+    program_color_camera_->Uniform1i("overlay_color_blue", overlay_color_blue_);
     program_color_point_cloud_->BindUniformBuffer(0, view_camera_uniform_);
-    program_color_point_cloud_->Uniform1f("point_size", 1.f);
+    program_color_point_cloud_->Uniform1f("point_size", 2.f);
     program_human_edge_->BindUniformBuffer(0, view_camera_uniform_);
 
     DrawPointCloudColor();
     DrawHumanLabelColor();
-    DrawMeshesColor();
+    DrawMeshesColor(true);
   }
 
   glDisable(GL_DEPTH_TEST);
@@ -288,7 +297,7 @@ void Renderer::Render()
   }
 }
 
-void Renderer::SaveImages(const std::string& directory, const std::string& filename_prefix)
+void Renderer::SaveImages(const std::string& directory, const std::string& filename_prefix, const std::string& filename_suffix)
 {
   // Prerequisites: Render() is called before saving images
 
@@ -304,7 +313,7 @@ void Renderer::SaveImages(const std::string& directory, const std::string& filen
 
   // Color image from robot
   framebuffer_color_->Use();
-  std::string filename_color_robot = directory + '\\' + filename_prefix + "-color_robot.jpg";
+  std::string filename_color_robot = directory + '\\' + filename_prefix + "-color_robot" + filename_suffix + ".jpg";
   buffer.resize(color_camera_resolution_(0) * color_camera_resolution_(1) * 3);
   glReadPixels(0, 0, color_camera_resolution_(0), color_camera_resolution_(1), GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
   stbi_write_jpg(filename_color_robot.c_str(), color_camera_resolution_(0), color_camera_resolution_(1), 3, buffer.data(), quality);
@@ -316,13 +325,13 @@ void Renderer::SaveImages(const std::string& directory, const std::string& filen
   framebuffer_vao_.SetTexture(0, framebuffer_depth_texture_);
   framebuffer_vao_.Draw();
 
-  std::string filename_depth_robot = directory + '\\' + filename_prefix + "-depth_robot.jpg";
+  std::string filename_depth_robot = directory + '\\' + filename_prefix + "-depth_robot" + filename_suffix + ".jpg";
   buffer.resize(depth_camera_resolution_(0) * depth_camera_resolution_ (1) * 3);
   glReadPixels(0, 0, depth_camera_resolution_(0), depth_camera_resolution_(1), GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
   stbi_write_jpg(filename_depth_robot.c_str(), depth_camera_resolution_(0), depth_camera_resolution_(1), 3, buffer.data(), quality);
 
   // Color image from data
-  std::string filename_color_data = directory + '\\' + filename_prefix + "-color_data.jpg";
+  std::string filename_color_data = directory + '\\' + filename_prefix + "-color_data" + filename_suffix + ".jpg";
   buffer = textures_.find("data_color")->second->GetImage();
   stbi_write_jpg(filename_color_data.c_str(), color_camera_resolution_(0), color_camera_resolution_(1), 3, buffer.data(), quality);
 
@@ -333,10 +342,33 @@ void Renderer::SaveImages(const std::string& directory, const std::string& filen
   data_depth_vao_.SetTexture(0, textures_.find("data_depth")->second);
   data_depth_vao_.Draw();
 
-  std::string filename_depth_data = directory + '\\' + filename_prefix + "-depth_data.jpg";
+  std::string filename_depth_data = directory + '\\' + filename_prefix + "-depth_data" + filename_suffix + ".jpg";
   buffer.resize(depth_camera_resolution_(0) * depth_camera_resolution_(1) * 3);
   glReadPixels(0, 0, depth_camera_resolution_(0), depth_camera_resolution_(1), GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
   stbi_write_jpg(filename_depth_data.c_str(), depth_camera_resolution_(0), depth_camera_resolution_(1), 3, buffer.data(), quality);
+
+  // Point cloud image from data
+  Framebuffer::UseScreen();
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glViewport(0, 0, 1280, 720); // screen size
+  auto view_camera = scene_->GetCamera("view");
+  program_color_camera_->Use();
+  program_color_camera_->BindUniformBuffer(0, view_camera_uniform_);
+  program_color_camera_->Uniform3f("eye_position", view_camera->GetEye());
+  program_color_camera_->Uniform1i("overlay_color_red", overlay_color_red_);
+  program_color_camera_->Uniform1i("overlay_color_blue", overlay_color_blue_);
+  program_color_point_cloud_->BindUniformBuffer(0, view_camera_uniform_);
+  program_color_point_cloud_->Uniform1f("point_size", 2.f);
+  program_human_edge_->BindUniformBuffer(0, view_camera_uniform_);
+
+  DrawPointCloudColor();
+  DrawHumanLabelColor();
+  DrawMeshesColor(true);
+
+  std::string filename_point_cloud = directory + '\\' + filename_prefix + "-point_cloud" + filename_suffix + ".jpg";
+  buffer.resize(1280 * 720 * 3);
+  glReadPixels(0, 0, 1280, 720, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
+  stbi_write_jpg(filename_point_cloud.c_str(), 1280, 720, 3, buffer.data(), quality);
 }
 
 void Renderer::UpdateCameraUniformFromScene()
@@ -437,50 +469,53 @@ void Renderer::SetDepthCameraResolution(int width, int height)
 
 void Renderer::TraverseSceneNode(std::shared_ptr<SceneNode> node, Affine3d transform)
 {
-  if (node->IsMeshNode())
+  if (node->IsShown())
   {
-    auto mesh_node = std::static_pointer_cast<MeshNode>(node);
-    const auto& mesh_filename = mesh_node->GetMeshFilename();
+    if (node->IsMeshNode())
+    {
+      auto mesh_node = std::static_pointer_cast<MeshNode>(node);
+      const auto& mesh_filename = mesh_node->GetMeshFilename();
 
-    if (mesh_objects_.find(mesh_filename) == mesh_objects_.cend())
-      mesh_objects_.emplace(mesh_filename, MeshObject(mesh_filename));
+      if (mesh_objects_.find(mesh_filename) == mesh_objects_.cend())
+        mesh_objects_.emplace(mesh_filename, MeshObject(mesh_filename));
 
-    meshes_to_draw_.emplace_back(mesh_filename, transform);
-  }
+      meshes_to_draw_.emplace_back(mesh_filename, transform);
+    }
 
-  else if (node->IsGroundNode())
-  {
-    // TODO
-  }
+    else if (node->IsGroundNode())
+    {
+      // TODO
+    }
 
-  else if (node->IsPointCloudNode())
-  {
-    point_cloud_node_ = std::static_pointer_cast<PointCloudNode>(node);
-    point_cloud_ = point_cloud_node_->GetPointCloud();
-    point_cloud_transform_ = point_cloud_node_->GetTransform();
-  }
-  else if (node->IsHumanLabelNode())
-  {
-    if (node->IsShown())
+    else if (node->IsPointCloudNode())
+    {
+      point_cloud_node_ = std::static_pointer_cast<PointCloudNode>(node);
+      point_cloud_ = point_cloud_node_->GetPointCloud();
+      point_cloud_transform_ = point_cloud_node_->GetTransform();
+    }
+    else if (node->IsHumanLabelNode())
     {
       human_label_node_ = std::static_pointer_cast<HumanLabelNode>(node);
       human_label_ = human_label_node_->GetLabel();
       human_label_transform_ = transform;
     }
-  }
 
-  for (auto child_node : node->GetChildren())
-    TraverseSceneNode(child_node, transform * child_node->GetTransform());
+    for (auto child_node : node->GetChildren())
+      TraverseSceneNode(child_node, transform * child_node->GetTransform());
+  }
 }
 
-void Renderer::DrawMeshesColor()
+void Renderer::DrawMeshesColor(bool transform_robot)
 {
   for (const auto& pair : meshes_to_draw_)
   {
     const auto& mesh_filename = pair.first;
     const auto& mesh_transform = pair.second;
 
-    program_color_camera_->UniformMatrix4f("model", mesh_transform.cast<float>().matrix());
+    if (!transform_robot)
+      program_color_camera_->UniformMatrix4f("model", mesh_transform.cast<float>().matrix());
+    else
+      program_color_camera_->UniformMatrix4f("model", (pointcloud_robot_transform_ * mesh_transform).cast<float>().matrix());
     program_color_camera_->Uniform1i("has_diffuse_texture", 1);
     program_color_camera_->Uniform3f("material.specular", Vector3f(1.f, 1.f, 1.f));
     program_color_camera_->Uniform1f("material.shininess", 0.55);
@@ -634,5 +669,15 @@ void Renderer::DrawHumanLabelDepth()
   human_label_point_vao_.Draw();
 
   glEnable(GL_DEPTH_TEST);
+}
+
+void Renderer::SwitchOverlayColorRed()
+{
+  overlay_color_red_ ^= true;
+}
+
+void Renderer::SwitchOverlayColorBlue()
+{
+  overlay_color_blue_ ^= true;
 }
 }

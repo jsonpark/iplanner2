@@ -47,6 +47,8 @@ public:
   void SelectSequenceFrame(const std::string& name, const std::string& index);
   void SelectFrame(int frame) override;
 
+  std::string GetCurrentSequenceName() const override;
+
   int FrameRate() const override;
   int RgbWidth() override;
   int RgbHeight() override;
@@ -67,6 +69,8 @@ public:
 
   Trajectory GetTrajectory() override;
   void SaveTrajectory(Trajectory trajectory) override;
+
+  double CurrentTime() const override;
 
 private:
   void LoadBody();

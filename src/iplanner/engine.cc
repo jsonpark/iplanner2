@@ -4,6 +4,8 @@
 #include <thread>
 #include <stdexcept>
 #include <chrono>
+#include <iomanip>
+#include <filesystem>
 
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
@@ -116,6 +118,21 @@ void Engine::MouseButton(GLFWwindow* window, Button button, MouseAction action, 
 
     redraw_ = true;
   }
+
+  // Controller
+  else if (window == window_controller_)
+  {
+    double x, y;
+    glfwGetCursorPos(window, &x, &y);
+
+    if (button == Button::LEFT && action == MouseAction::PRESS)
+      controller_->Clicked(x, y);
+
+    else if (button == Button::LEFT && action == MouseAction::RELEASE)
+      controller_->ClickReleased();
+
+    redraw_controller_ = true;
+  }
 }
 
 void Engine::MouseMove(GLFWwindow* window, double x, double y)
@@ -151,6 +168,14 @@ void Engine::MouseMove(GLFWwindow* window, double x, double y)
 
     redraw_ = true;
   }
+
+  // Controller
+  else if (window == window_controller_)
+  {
+    controller_->MouseMove(x, y);
+
+    redraw_controller_ = true;
+  }
 }
 
 void Engine::Keyboard(GLFWwindow* window, Key key, KeyAction action, int mods)
@@ -171,6 +196,26 @@ void Engine::Keyboard(GLFWwindow* window, Key key, KeyAction action, int mods)
         }
         else
           animation_ = false;
+        break;
+
+        // Hide/show future nodes
+      case Key::F:
+        for (int i = 0; i < robot_future_nodes_.size(); i++)
+        {
+          if (robot_future_nodes_[i]->IsShown())
+            robot_future_nodes_[i]->Hide();
+          else
+            robot_future_nodes_[i]->Show();
+        }
+        break;
+
+        // Overlay color
+      case Key::C:
+        renderer_->SwitchOverlayColorRed();
+        break;
+
+      case Key::B:
+        renderer_->SwitchOverlayColorBlue();
         break;
 
         // Number 1-6 selects view mode
@@ -200,21 +245,45 @@ void Engine::Keyboard(GLFWwindow* window, Key key, KeyAction action, int mods)
 
         // Keyboard up/down changes sequence
       case Key::UP:
+        SaveCurrentTrajectory();
         animation_time_ = 0.;
         animation_start_time_ = glfwGetTime();
         dataset_->PreviousSequence();
+        sequence_changed_ = true;
         break;
 
       case Key::DOWN:
+        SaveCurrentTrajectory();
         animation_time_ = 0.;
         animation_start_time_ = glfwGetTime();
         dataset_->NextSequence();
+        sequence_changed_ = true;
+        break;
+
+        // Keyboard left/right to move video by 1 sec
+      case Key::LEFT:
+        if (animation_time_ < 1.)
+        {
+          animation_time_ = 0.;
+          animation_start_time_ = glfwGetTime();
+        }
+        else
+        {
+          animation_time_ -= 1.;
+          animation_start_time_ += 1.;
+        }
+        break;
+
+      case Key::RIGHT:
+        animation_time_ += 1.;
+        animation_start_time_ -= 1.;
         break;
 
         // Replay
       case Key::R:
         animation_time_ = 0.;
         animation_start_time_ = glfwGetTime();
+        animation_ = false;
         break;
 
         // Save sample images
@@ -222,21 +291,86 @@ void Engine::Keyboard(GLFWwindow* window, Key key, KeyAction action, int mods)
         SaveImageSamples();
         break;
 
+        // Screen shot
+      case Key::F8:
+        SaveScreenShot();
+        break;
+
+        // Save video
+      case Key::V:
+        SaveVideo();
+        break;
+
         // Numpad (KP_x) sets a dataset
       case Key::KP_1:
+        SaveCurrentTrajectory();
         ChooseUtKinect();
         break;
 
       case Key::KP_2:
+        SaveCurrentTrajectory();
         ChooseWnp();
         break;
 
       case Key::KP_3:
+        SaveCurrentTrajectory();
         ChooseOcclusion();
+        break;
+
+        // Page up/down to sample images
+      case Key::PAGE_UP:
+        SaveCurrentTrajectory();
+        ChoosePreviousSampleSequence();
+        break;
+
+      case Key::PAGE_DOWN:
+        SaveCurrentTrajectory();
+        ChooseNextSampleSequence();
+        break;
+
+      case Key::HOME:
+        SaveCurrentTrajectory();
+        ChooseCurrentSampleSequence();
         break;
       }
     }
   }
+}
+
+void Engine::ChooseCurrentSampleSequence()
+{
+  const auto& sample_sequence = sample_sequences_[sample_sequence_index_];
+
+  if (sample_sequence.dataset == "utkinect")
+    ChooseUtKinect();
+
+  else if (sample_sequence.dataset == "wnp")
+    ChooseWnp();
+
+  else if (sample_sequence.dataset == "occlusion")
+    ChooseOcclusion();
+
+  if (sample_sequence_index_ == 4)
+    sample_sequence_index_ = sample_sequence_index_;
+
+  dataset_->SelectSequence(sample_sequence.sequence);
+  sequence_changed_ = true;
+}
+
+void Engine::ChoosePreviousSampleSequence()
+{
+  if (sample_sequence_index_ > 0)
+    sample_sequence_index_--;
+
+  ChooseCurrentSampleSequence();
+}
+
+void Engine::ChooseNextSampleSequence()
+{
+  if (sample_sequence_index_ < sample_sequences_.size() - 1)
+    sample_sequence_index_++;
+
+  ChooseCurrentSampleSequence();
 }
 
 void Engine::ChooseUtKinect()
@@ -256,6 +390,7 @@ void Engine::ChooseUtKinect()
     animation_ = false;
 
     dataset_changed_ = true;
+    sequence_changed_ = true;
   }
 }
 
@@ -276,6 +411,7 @@ void Engine::ChooseWnp()
     animation_ = false;
 
     dataset_changed_ = true;
+    sequence_changed_ = true;
   }
 }
 
@@ -296,6 +432,7 @@ void Engine::ChooseOcclusion()
     animation_ = false;
 
     dataset_changed_ = true;
+    sequence_changed_ = true;
   }
 }
 
@@ -336,6 +473,7 @@ void Engine::SaveImageSamples()
       ChooseUtKinect();
 
       dataset_utkinect_->SelectSequenceFrame(image_sample.sequence, image_sample.index);
+      sequence_changed_ = true;
 
       Update();
 
@@ -353,6 +491,7 @@ void Engine::SaveImageSamples()
       ChooseWnp();
 
       dataset_wnp_->SelectSequenceFrame(image_sample.sequence, image_sample.index);
+      sequence_changed_ = true;
 
       Update();
 
@@ -370,6 +509,7 @@ void Engine::SaveImageSamples()
       ChooseOcclusion();
 
       dataset_occlusion_->SelectSequenceFrame(image_sample.sequence, image_sample.index);
+      sequence_changed_ = true;
 
       Update();
 
@@ -384,6 +524,117 @@ void Engine::SaveImageSamples()
   }
 
   image_samples_saved_ = true;
+}
+
+void Engine::SaveScreenShot()
+{
+  namespace fs = std::filesystem;
+
+  std::string sequence_name = dataset_->GetCurrentSequenceName();
+  std::replace(sequence_name.begin(), sequence_name.end(), '\\', '-');
+
+  // TODO: linux directory character
+  std::string directory = config_.GetImageSampleSaveDirectory();
+
+  std::cout << "Screen shot save directory: " << directory << std::endl;
+
+  auto ZeroPeddingIndex = [](int digits, int index) {
+    std::string x(digits, '0');
+
+    for (int i = 0; i < digits; i++)
+    {
+      x[digits - i - 1] = '0' + (index % 10);
+      index /= 10;
+    }
+
+    return x;
+  };
+
+  Update();
+
+  renderer_->Render();
+
+  // TODO: save screen shot
+  /*
+  std::string filename = ZeroPeddingIndex(4, dataset_->CurrentFrameIndex());
+  std::replace(filename.begin(), filename.end(), '\\', '-');
+  std::cout << "Saving to " << filename << "*.* ... ";
+  renderer_->SaveImages(directory, "video", filename);
+  std::cout << "Finished!" << std::endl;
+  */
+}
+
+void Engine::SaveVideo()
+{
+  namespace fs = std::filesystem;
+
+  std::string sequence_name = dataset_->GetCurrentSequenceName();
+  std::replace(sequence_name.begin(), sequence_name.end(), '\\', '-');
+
+  // TODO: linux directory character
+  std::string directory = config_.GetVideoSaveDirectory() + '\\' + sequence_name;
+
+  if (!fs::exists(directory))
+  {
+    std::cout << "Creating video directory: " << directory << std::endl;
+    fs::create_directories(directory);
+  }
+
+  std::cout << "Saving image sequence file in: " << directory << std::endl;
+
+  dataset_->SelectFrame(0);
+  int frame = 0;
+
+  auto ZeroPeddingIndex = [](int digits, int index) {
+    std::string x(digits, '0');
+
+    for (int i = 0; i < digits; i++)
+    {
+      x[digits - i - 1] = '0' + (index % 10);
+      index /= 10;
+    }
+
+    return x;
+  };
+
+  animation_ = false;
+  animation_time_ = 0.;
+  animation_start_time_ = glfwGetTime();
+
+  double video_length = dataset_->CurrentSequenceLength();
+  double frame_length = 1. / dataset_->FrameRate();
+
+  // Wnp has 60fps 
+  if (dataset_->FrameRate() == 60)
+    frame_length = 1. / 6.;
+
+  while (true)
+  {
+    animation_time_ += frame_length;
+
+    if (animation_time_ > video_length)
+      break;
+
+    Update();
+
+    renderer_->Render();
+
+    std::string filename = ZeroPeddingIndex(4, frame);
+    std::replace(filename.begin(), filename.end(), '\\', '-');
+    std::cout << "Saving to " << filename << "*.* ... ";
+    renderer_->SaveImages(directory, "video", filename);
+    std::cout << "Finished!" << std::endl;
+
+    // Move to next frame until the end of frames
+    frame++;
+  }
+}
+
+void Engine::SaveCurrentTrajectory()
+{
+  std::cout << "Engine: Saving current trajectory" << std::endl;
+
+  dataset_->SaveTrajectory(*trajectory_);
 }
 
 void Engine::Run()
@@ -468,8 +719,6 @@ void Engine::Run()
 
 
     // Draw controller
-    UpdateController();
-
     if (redraw_controller_)
     {
       glfwMakeContextCurrent(window_controller_);
@@ -487,11 +736,20 @@ void Engine::Run()
 
   glfwTerminate();
 
+  // Save current trajectory after exiting windows
+  SaveCurrentTrajectory();
+
   planner_->Stop();
 }
 
 void Engine::Initialize()
 {
+  // Trajectory memory allocation
+  trajectory_ = std::make_unique<Trajectory>(1, 2, 1.);
+
+  // Create sample sequence list
+  sample_sequences_ = config_.GetImageSamples();
+
   // Renderer
   glfwMakeContextCurrent(window_renderer_);
 
@@ -687,17 +945,6 @@ void Engine::Initialize()
 
   robot_state_ = std::make_shared<RobotState>(robot_arm_model_);
 
-  //robot_state_->JointPosition(0) = 0.193075;
-  robot_state_->JointPosition(3) = 0.345;
-  robot_state_->JointPosition(4) = -0.2338021;
-  robot_state_->JointPosition(5) = 0.21;
-  robot_state_->JointPosition(6) = -0.331486;
-  robot_state_->JointPosition(7) = -0.455;
-  robot_state_->JointPosition(8) = -0.231486;
-  robot_state_->JointPosition(9) = 1.31874;
-  robot_state_->JointPosition(10) = 0.025;
-  robot_state_->JointPosition(11) = 0.025;
-
   // Dataset
   dataset_wnp_ = std::make_shared<Wnp>(config_.GetDatasetDirectory("wnp"));
   dataset_utkinect_ = std::make_shared<UtKinect>(config_.GetDatasetDirectory("utkinect"));
@@ -733,6 +980,10 @@ void Engine::Initialize()
   planner_->RunAsync();
 
   ChooseOcclusion();
+
+
+  // Set sequence is changed so sequence-associated initializations can be executed
+  sequence_changed_ = true;
 }
 
 void Engine::InitializeScene()
@@ -741,6 +992,13 @@ void Engine::InitializeScene()
   robot_node_ = RobotNode::Create(robot_arm_model_);
   auto root = scene_->GetRootNode();
   SceneNode::Connect(root, robot_node_);
+
+  for (int i = 0; i < num_future_robots_; i++)
+  {
+    auto robot_node = RobotNode::Create(robot_arm_model_);
+    robot_future_nodes_.push_back(robot_node);
+    SceneNode::Connect(root, robot_node);
+  }
 
   auto ground = std::make_shared<GroundNode>();
   SceneNode::Connect(root, ground);
@@ -867,11 +1125,73 @@ void Engine::Update()
     dataset_changed_ = false;
   }
 
-  if (animation_)
+  if (sequence_changed_)
   {
+    *trajectory_ = dataset_->GetTrajectory();
+    const auto& trajectory = *trajectory_;
+
+    // TODO: ignore first 3 joints to head camera
+    constexpr int offset = 3;
+    controller_->SetControllerSize(trajectory.Rows() - offset, trajectory.Cols());
+
+    for (int i = offset; i < trajectory.Rows(); i++)
+    {
+      const auto& joint = robot_arm_model_->Joint(i);
+      auto limit = joint.GetLimit();
+
+      // TODO: continuous joints has no limits. The limits are set to [-PI, PI]
+      if (limit.lower == 0. && limit.upper == 0.)
+      {
+        constexpr double pi = 3.1415926535897932384626433832795;
+        limit.lower = -pi / 2.;
+        limit.upper = pi / 2.;
+      }
+
+      for (int j = 0; j < trajectory.Cols(); j++)
+      {
+        auto value = trajectory(i, j);
+        if (value < limit.lower)
+          value = limit.lower;
+        if (value > limit.upper)
+          value = limit.upper;
+
+        double controller_value = (value - limit.lower) / (limit.upper - limit.lower);
+
+        controller_->At(i - offset, j) = controller_value;
+      }
+    }
+
+    sequence_changed_ = false;
+  }
+
+  if (animation_)
     animation_time_ = t;
-    auto frame_number = static_cast<int>(animation_time_ * dataset_->FrameRate());
-    dataset_->SelectFrame(frame_number);
+
+  auto frame_number = static_cast<int>(animation_time_ * dataset_->FrameRate());
+  dataset_->SelectFrame(frame_number);
+
+  // Update trajectory changed by controller
+  // TODO: ignore first 3 joints to head camera
+  constexpr int offset = 3;
+  for (int i = offset; i < trajectory_->Rows(); i++)
+  {
+    const auto& joint = robot_arm_model_->Joint(i);
+    auto limit = joint.GetLimit();
+
+    // TODO: continuous joints has no limits. The limits are set to [-PI, PI]
+    if (limit.lower == 0. && limit.upper == 0.)
+    {
+      constexpr double pi = 3.1415926535897932384626433832795;
+      limit.lower = -pi / 2.;
+      limit.upper = pi / 2.;
+    }
+
+    for (int j = 0; j < trajectory_->Cols(); j++)
+    {
+      double controller_value = controller_->At(i - offset, j);
+      double joint_value = limit.lower + controller_value * (limit.upper - limit.lower);
+      (*trajectory_)(i, j) = joint_value;
+    }
   }
 
   // Update point cloud
@@ -901,14 +1221,24 @@ void Engine::Update()
     */
 
   // Robot trajectory from dataset
+  /*
   auto trajectory = dataset_->GetTrajectory();
-  //std::cout << "trajectory dimension: " << trajectory.Rows() << " x " << trajectory.Cols() << std::endl;
+  std::cout << "trajectory dimension: " << trajectory.Rows() << " x " << trajectory.Cols() << std::endl;
   auto trajectory_point = trajectory.AtTime(animation_time_);
+  */
 
-  for (int i = 0; i < state.NumJoints() && i < trajectory.Rows(); i++)
+  // Robot trajectory from controller
+  VectorXd trajectory_point;
+
+  if (animation_)
+    trajectory_point = trajectory_->AtTime(animation_time_);
+  else
+    trajectory_point = trajectory_->AtTime(dataset_->CurrentTime());
+
+  for (int i = 0; i < state.NumJoints() && i < trajectory_->Rows(); i++)
     state.JointPosition(i) = trajectory_point(i);
 
-  for (int i = trajectory.Rows(); i < state.NumJoints(); i++)
+  for (int i = trajectory_->Rows(); i < state.NumJoints(); i++)
     state.JointPosition(i) = 0.;
 
   state.ForwardKinematics();
@@ -938,18 +1268,26 @@ void Engine::UpdateScene()
   for (int i = 0; i < state.NumJoints(); i++)
     robot_node_->SetJointValue(state.JointName(i), state.JointPosition(i));
 
+  // TODO: Future robot nodes
+  for (int i = 0; i < num_future_robots_; i++)
+  {
+    const double future_time = future_robot_timestep_ * (i + 1);
+
+    // Robot trajectory from controller
+    VectorXd trajectory_point;
+
+    if (animation_)
+      trajectory_point = trajectory_->AtTime(animation_time_ + future_time);
+    else
+      trajectory_point = trajectory_->AtTime(dataset_->CurrentTime() + future_time);
+
+    for (int j = 0; j < state.NumJoints(); j++)
+      robot_future_nodes_[i]->SetJointValue(state.JointName(j), trajectory_point(j));
+  }
+
   redraw_ = true;
-}
 
-void Engine::UpdateController()
-{
-  glfwMakeContextCurrent(window_controller_);
-
-  auto trajectory = dataset_->GetTrajectory();
-  controller_->SetControllerSize(trajectory.Rows(), trajectory.Cols());
-
-  // TODO
-
+  // TODO: move controller redraw to where the controller state changesn
   redraw_controller_ = true;
 }
 

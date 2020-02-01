@@ -31,7 +31,7 @@ public:
   void Initialize();
   void Render();
 
-  void SaveImages(const std::string& directory, const std::string& filename_prefix);
+  void SaveImages(const std::string& directory, const std::string& filename_prefix, const std::string& filename_suffix = "");
 
   void SetScene(std::shared_ptr<Scene> scene);
 
@@ -50,6 +50,9 @@ public:
     it->second->Update((const void*)buffer.data());
   }
 
+  void SwitchOverlayColorRed();
+  void SwitchOverlayColorBlue();
+
 private:
   Engine* engine_;
 
@@ -60,7 +63,7 @@ private:
 
   void TraverseSceneNode(std::shared_ptr<SceneNode> node, Affine3d transform = Affine3d::Identity());
 
-  void DrawMeshesColor();
+  void DrawMeshesColor(bool transform_robot = false); // transform for getting result images
   void DrawMeshesDepth();
 
   // Assuming only one point cloud in the scene
@@ -163,6 +166,11 @@ private:
 
   // Mesh files to draw
   std::vector<std::pair<std::string, Affine3d>> meshes_to_draw_;
+
+  // Coloring and transforming for getting result images
+  bool overlay_color_red_ = false;
+  bool overlay_color_blue_ = false;
+  Affine3d pointcloud_robot_transform_;
 };
 }
 

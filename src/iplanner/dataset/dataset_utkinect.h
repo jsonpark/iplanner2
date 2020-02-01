@@ -31,6 +31,8 @@ public:
   void SelectSequenceFrame(const std::string& name, const std::string& index);
   void SelectFrame(int frame) override;
 
+  std::string GetCurrentSequenceName() const override;
+
   int FrameRate() const override;
   int RgbWidth() override;
   int RgbHeight() override;
@@ -52,8 +54,12 @@ public:
   Trajectory GetTrajectory() override;
   void SaveTrajectory(Trajectory trajectory) override;
 
+  double CurrentTime() const override;
+
 private:
   void LoadBody();
+
+  void LoadTrajectory();
 
   std::string directory_;
 
@@ -79,6 +85,9 @@ private:
   std::vector<int> joint_indices_;
 
   bool body_loaded_ = false;
+
+  // Robot trajectory
+  std::unique_ptr<Trajectory> trajectory_;
 };
 }
 

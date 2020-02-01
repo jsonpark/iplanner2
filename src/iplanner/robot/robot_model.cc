@@ -139,7 +139,7 @@ void RobotModel::Fixator::Traverse(int link_index, int new_link_index, Affine3d 
       // Add joint
       auto new_joint = parent_joint;
       new_joint.SetParentLinkName(new_model_->links_[new_link_index].GetName());
-      new_joint.SetOrigin(transform * new_joint.GetOrigin());
+      new_joint.SetOrigin(transform * parent_joint.GetOrigin());
       new_model_->AddJoint(std::move(new_joint));
 
       // Add link

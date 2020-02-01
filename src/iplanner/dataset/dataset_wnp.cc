@@ -370,22 +370,31 @@ void Wnp::LoadBodyFromMatFile()
 
 void Wnp::LoadTrajectory()
 {
-  auto trajectory_filename = directory_ + directory_character + sequence_names_[current_sequence_] + directory_character + "robot_trajectory.txt";
+  auto filename = directory_ + directory_character + sequence_names_[current_sequence_] + directory_character + "robot_trajectory.txt";
 
-  if (fs::exists(trajectory_filename))
+  if (fs::exists(filename))
   {
-    // TODO: load
-    std::cout << "Loading Robot Trajectory" << std::endl;
+    std::cout << "Wnp: Loading Robot Trajectory" << std::endl;
+    trajectory_ = std::make_unique<Trajectory>(Dataset::LoadTrajectory(filename));
+
+    for (int j = 0; j < trajectory_->Cols(); j++)
+    {
+      for (int i = 0; i < trajectory_->Rows(); i++)
+      {
+        std::cout << trajectory_->operator()(i, j) << ' ';
+      }
+      std::cout << std::endl;
+    }
   }
   else
   {
-    std::cout << "Robot trajectory file not found, loading initial trajectory" << std::endl;
+    std::cout << "Wnp: Robot trajectory file not found, loading initial trajectory" << std::endl;
 
     double duration = CurrentSequenceLength();
     int duration_ceil = static_cast<int>(std::ceil(duration)) + 1;
 
-    // TODO: num_joints (the fetch robot model has 11 active joints)
-    trajectory_ = std::make_unique<Trajectory>(11, duration_ceil, static_cast<double>(duration_ceil));
+    // TODO: num_joints (the fetch robot model has 12 active joints)
+    trajectory_ = std::make_unique<Trajectory>(12, duration_ceil, static_cast<double>(duration_ceil));
   }
 }
 
@@ -432,6 +441,11 @@ void Wnp::SelectSequenceFrame(const std::string& name, const std::string& index)
   }
 
   std::cout << "Wnp: could not find frame index \"" << index << "\"." << std::endl;
+}
+
+std::string Wnp::GetCurrentSequenceName() const
+{
+  return sequence_names_[current_sequence_];
 }
 
 int Wnp::FrameRate() const
@@ -628,16 +642,12 @@ Trajectory Wnp::GetTrajectory()
 
 void Wnp::SaveTrajectory(Trajectory trajectory)
 {
-  auto trajectory_filename = directory_ + directory_character + sequence_names_[current_sequence_] + directory_character + "robot_trajectory.txt";
+  std::string filename = directory_ + directory_character + sequence_names_[current_sequence_] + directory_character + "robot_trajectory.txt";
+  Dataset::SaveTrajectory(trajectory, filename);
+}
 
-  if (fs::exists(trajectory_filename))
-  {
-    // TODO: load
-    std::cout << "Overwriting robot trajectory file" << std::endl;
-  }
-  else
-  {
-    std::cout << "Create a robot trajectory file" << std::endl;
-  }
+double Wnp::CurrentTime() const
+{
+  return static_cast<double>(current_frame_) / FrameRate();
 }
 }

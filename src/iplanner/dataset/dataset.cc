@@ -1,6 +1,7 @@
 #include "iplanner/dataset/dataset.h"
 
 #include <iostream>
+#include <fstream>
 
 namespace iplanner
 {
@@ -23,6 +24,11 @@ void Dataset::SelectSequence(const std::string& name)
 
 void Dataset::SelectFrame(int index)
 {
+}
+
+std::string Dataset::GetCurrentSequenceName() const
+{
+  return std::string("Dataset");
 }
 
 int Dataset::FrameRate() const
@@ -109,5 +115,50 @@ Trajectory Dataset::GetTrajectory()
 void Dataset::SaveTrajectory(Trajectory trajectory)
 {
   std::cout << "Dataset base class SaveTrajectory" << std::endl;
+}
+
+double Dataset::CurrentTime() const
+{
+  return 0.;
+}
+
+Trajectory Dataset::LoadTrajectory(const std::string& filename)
+{
+  std::ifstream in(filename);
+
+  int rows, cols;
+  double time;
+  in >> rows >> cols >> time;
+
+  Trajectory trajectory(rows, cols, time);
+
+  for (int j = 0; j < cols; j++)
+  {
+    for (int i = 0; i < rows; i++)
+      in >> trajectory(i, j);
+  }
+
+  in.close();
+
+  return trajectory;
+}
+
+void Dataset::SaveTrajectory(Trajectory trajectory, const std::string& filename)
+{
+  // tab separated values
+
+  std::ofstream out(filename);
+
+  out << trajectory.Rows() << '\t' << trajectory.Cols() << '\t' << trajectory.Time() << std::endl;
+
+  // Transpose the matrix so that each line represents a robot joint values at a frame
+  for (int j = 0; j < trajectory.Cols(); j++)
+  {
+    for (int i = 0; i < trajectory.Rows(); i++)
+      out << trajectory(i, j) << '\t';
+    out << std::endl;
+  }
+
+  out.close();
 }
 }

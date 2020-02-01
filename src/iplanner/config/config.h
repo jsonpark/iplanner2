@@ -9,7 +9,7 @@ namespace iplanner
 {
 class Config
 {
-private:
+public:
   struct ImageSample
   {
     std::string dataset;
@@ -22,6 +22,11 @@ public:
   ~Config();
 
   void Load(const std::string& filename);
+
+  const auto& GetVideoSaveDirectory() const
+  {
+    return video_save_direcotory_;
+  }
 
   const auto& GetImageSampleSaveDirectory() const
   {
@@ -48,6 +53,7 @@ private:
 
   std::string image_sample_save_directory_;
   std::vector<ImageSample> image_samples_;
+  std::string video_save_direcotory_;
 };
 }
 

@@ -19,8 +19,8 @@ class Controller
 private:
   static const int vertical_gap_ = 10;
   static const int point_half_size_ = 5;
-  static const int bar_width_ = 5;
-  static const int graph_line_width_ = 2;
+  const float bar_width_ = 2.f;
+  const float graph_line_width_ = 1.f;
 
 public:
   Controller() = delete;
@@ -28,11 +28,24 @@ public:
   ~Controller();
 
   void Resize(int width, int height);
+  void Clicked(double x, double y);
+  void ClickReleased();
+  void MouseMove(double x, double y);
 
   void SetControllerSize(int rows, int cols);
 
   void Initialize();
   void Render();
+
+  auto& At(int row, int col)
+  {
+    return values_[row][col];
+  }
+
+  auto At(int row, int col) const
+  {
+    return values_[row][col];
+  }
 
 private:
   // x, y, width, height
@@ -40,6 +53,8 @@ private:
 
   void DrawRect(int x, int y, int width, int height, const Vector3f& color);
   void DrawLine(int x0, int y0, int x1, int y1, const Vector3f& color, float line_width = 1.f);
+
+  void ControlValueWithMousePos(double x, double y);
 
   Engine* engine_;
 
@@ -49,6 +64,9 @@ private:
   int rows_ = 1;
   int cols_ = 1;
   std::vector<std::vector<double>> values_;
+
+  int clicked_row_ = -1;
+  int clicked_col_ = -1;
 
   std::shared_ptr<Program> program_planar_;
 

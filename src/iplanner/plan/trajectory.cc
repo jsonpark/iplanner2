@@ -44,11 +44,14 @@ VectorXd Trajectory::AtTime(double t) const
     VectorXd p0 = trajectory_.col(index);
     VectorXd p1 = trajectory_.col(index + 1);
 
-    VectorXd pb = index == 0 ? static_cast<VectorXd>(p0 - (p1 - p0)) : trajectory_.col(index - 1);
-    VectorXd p2 = index + 1 == num_timepoints - 1 ? static_cast<VectorXd>(p1 - (p0 - p1)) : trajectory_.col(index + 2);
+    //VectorXd pb = index == 0 ? static_cast<VectorXd>(p0 - (p1 - p0)) : trajectory_.col(index - 1);
+    //VectorXd p2 = index + 1 == num_timepoints - 1 ? static_cast<VectorXd>(p1 - (p0 - p1)) : trajectory_.col(index + 2);
 
-    VectorXd v0 = (p0 - pb) * 3.;
-    VectorXd v1 = (p2 - p1) * 3.;
+    VectorXd pb = index == 0 ? p0 : trajectory_.col(index - 1);
+    VectorXd p2 = index + 1 == num_timepoints - 1 ? p1 : trajectory_.col(index + 2);
+
+    VectorXd v0 = (p1 - pb) * .5;
+    VectorXd v1 = (p2 - p0) * .5;
 
     return (2. * x3 - 3. * x2 + 1.) * p0
       + (x3 - 2. * x2 + x) * v0

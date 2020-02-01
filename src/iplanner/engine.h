@@ -200,6 +200,9 @@ public:
   Vector2i GetScreenSize() const;
 
   void SaveImageSamples();
+  void SaveScreenShot();
+  void SaveCurrentTrajectory();
+  void SaveVideo();
 
   auto GetViewMode() const
   {
@@ -214,10 +217,12 @@ private:
   void ChooseWnp();
   void ChooseOcclusion();
 
+  void ChooseCurrentSampleSequence();
+  void ChoosePreviousSampleSequence();
+  void ChooseNextSampleSequence();
+
   void Update();
   void UpdateScene();
-
-  void UpdateController();
 
   int width_ = 1280;
   int height_ = 720;
@@ -239,6 +244,7 @@ private:
   bool redraw_ = true;
   bool animation_ = false;
   bool dataset_changed_ = false;
+  bool sequence_changed_ = false;
   double animation_start_time_ = 0.;
   double animation_time_ = 0.;
 
@@ -271,8 +277,14 @@ private:
   Affine3d head_to_color_camera_transform_;
   Affine3d head_to_depth_camera_transform_;
 
+  std::unique_ptr<Trajectory> trajectory_;
+
   // Robot scene node
   std::shared_ptr<RobotNode> robot_node_;
+
+  const int num_future_robots_ = 3;
+  const double future_robot_timestep_ = 1.0;
+  std::vector<std::shared_ptr<RobotNode>> robot_future_nodes_;
 
   // Dataset
   std::shared_ptr<UtKinect> dataset_utkinect_;
@@ -300,6 +312,10 @@ private:
 
   // Point cloud scene node
   std::shared_ptr<PointCloudNode> point_cloud_node_;
+
+  // Sample sequences for generating results
+  std::vector<Config::ImageSample> sample_sequences_;
+  int sample_sequence_index_ = 0;
 };
 }
 

@@ -23,6 +23,64 @@ void Controller::Resize(int width, int height)
   height_ = height;
 }
 
+void Controller::Clicked(double x, double y)
+{
+  // y direction flipped
+  y = height_ - y;
+
+  clicked_row_ = -1;
+  clicked_col_ = -1;
+
+  // TODO: binary search
+  for (int i = 0; i < rows_; i++)
+  {
+    for (int j = 0; j < cols_; j++)
+    {
+      auto area = CellArea(i, j);
+      if (area(0) <= x && x <= area(0) + area(2) &&
+        area(1) <= y && y <= area(1) + area(3))
+      {
+        clicked_row_ = i;
+        clicked_col_ = j;
+
+        ControlValueWithMousePos(x, y);
+
+        return;
+      }
+    }
+  }
+}
+
+void Controller::ClickReleased()
+{
+  clicked_row_ = -1;
+  clicked_col_ = -1;
+}
+
+void Controller::MouseMove(double x, double y)
+{
+  // y direction flipped
+  y = height_ - y;
+
+  ControlValueWithMousePos(x, y);
+}
+
+void Controller::ControlValueWithMousePos(double x, double y)
+{
+  if (clicked_row_ == -1 || clicked_col_ == -1)
+    return;
+
+  auto area = CellArea(clicked_row_, clicked_col_);
+
+  double t = (y - area(1)) / area(3);
+  if (t < 0.)
+    t = 0.;
+  if (t > 1.)
+    t = 1.;
+
+  values_[clicked_row_][clicked_col_] = t;
+}
+
 void Controller::SetControllerSize(int rows, int cols)
 {
   rows_ = rows;

@@ -34,6 +34,11 @@ public:
     return static_cast<int>(trajectory_.cols());
   }
 
+  auto Time() const
+  {
+    return time_;
+  }
+
   VectorXd AtTime(double t) const;
 
 private:

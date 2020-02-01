@@ -68,6 +68,11 @@ public:
     return origin_;
   }
 
+  const auto& GetLimit() const
+  {
+    return limit_;
+  }
+
   // Operations
   Affine3d GetTransform(double joint_value) const;
 

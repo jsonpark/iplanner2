@@ -38,6 +38,7 @@ const KinectV1::CameraParameters KinectV1::depth_params_ =
 };
 */
 
+/*
 const KinectV1::CameraParameters KinectV1::color_params_ =
 {
   // Intrinsic
@@ -45,6 +46,39 @@ const KinectV1::CameraParameters KinectV1::color_params_ =
   .fy = 493.033034,
   .cx = 322.515987, // .cx = 319.21872,
   .cy = 259.055966, // .cy = 225.29767,
+
+  // Distortion
+  .k1 = 0.108983708314500,
+  .k2 = -0.239830795000911,
+  .p1 = -0.001984065259398,
+  .p2 = -0.002884597433015,
+  .k3 = 0.,
+};
+
+const KinectV1::CameraParameters KinectV1::depth_params_ =
+{
+  // Intrinsic
+  .fx = 521.179233,
+  .fy = 493.033034,
+  .cx = 322.515987,
+  .cy = 259.055966,
+
+  // Distortion
+  .k1 = -0.127613248346941,
+  .k2 = 0.470606007302241,
+  .p1 = 0.000048478690145,
+  .p2 = 0.017448057052172,
+  .k3 = 0.000000000000000,
+};
+*/
+
+const KinectV1::CameraParameters KinectV1::color_params_ =
+{
+  // Intrinsic
+  .fx = 470.,
+  .fy = 470.,
+  .cx = 332.515987, // .cx = 319.21872,
+  .cy = 289.055966, // .cy = 225.29767,
 
   // Distortion
   .k1 = 0.108983708314500,

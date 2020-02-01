@@ -21,6 +21,8 @@ public:
   virtual void SelectSequence(const std::string& name);
   virtual void SelectFrame(int index);
 
+  virtual std::string GetCurrentSequenceName() const;
+
   virtual int FrameRate() const;
   virtual int RgbWidth();
   virtual int RgbHeight();
@@ -43,6 +45,11 @@ public:
   virtual void SaveTrajectory(Trajectory trajectory);
 
   virtual double CurrentSequenceLength() const;
+  virtual double CurrentTime() const;
+
+  // TODO: save/load trajectory functions move to Trajectory class
+  Trajectory LoadTrajectory(const std::string& filename);
+  void SaveTrajectory(Trajectory trajectory, const std::string& filename);
 
 private:
 };
