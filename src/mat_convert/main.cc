@@ -29,9 +29,10 @@ int ExtractFileIndex(const std::string& filename)
 
 int main()
 {
-  constexpr bool depth_conversion = true;
+  constexpr bool depth_conversion = false;
   constexpr bool body_conversion = false;
-  constexpr bool overwrite = true;
+  constexpr bool overwrite = false;
+  constexpr bool clean = true;
 
   std::string directory = "..\\..\\dataset\\watch-n-patch";
   constexpr char directory_character = '\\';
@@ -104,6 +105,23 @@ int main()
     }
 
     std::cout << "Finished converting depth files" << std::endl;
+  }
+
+  // Cleaning converted depth files
+  if (clean)
+  {
+    std::cout << "Cleaning depth files..." << std::endl;
+
+    for (const auto& sequence_name : sequence_names)
+    {
+      std::cout << sequence_name << ":" << std::endl;
+
+      // Create new depth folder
+      std::cout << "deleting directory: " << directory + directory_character + sequence_name + directory_character + "depth_raw" << std::endl;
+      fs::remove_all(directory + directory_character + sequence_name + directory_character + "depth_raw");
+    }
+
+    std::cout << "Finished cleaning depth files" << std::endl;
   }
 
   // Body files
